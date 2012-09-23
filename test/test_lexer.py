@@ -1,6 +1,5 @@
 """Test lexer"""
-from reticulatus.parser import tokens
-from reticulatus.parser import lexer
+from reticulatus.toolpath.parser import lexer, tokens
 import os
 
 import unittest
