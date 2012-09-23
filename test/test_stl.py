@@ -58,11 +58,10 @@ class TestSTL(unittest.TestCase):
                 if obj.is_Segment_3():
                     segment = obj.get_Segment_3()
                     #print "Line intersection", segment
-                    print "Line from: ", segment.source(), "to", segment.target()
-
-
-
-
+                    #print "Line from: ", segment.source(), "to", segment.target()
+                    start = segment.source()
+                    end = segment.target()
+                    print "HXYZ: ",start.x(), start.y(), start.z()
         assert False
 
 

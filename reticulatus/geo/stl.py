@@ -373,8 +373,8 @@ class STL():
         poly = Polyhedron_3()
         for facet in self._facets:
             points = [Point_3(*point) for point in facet['p']]
-            print points
-            print (poly.make_triangle.__doc__)
+            #print points
+            #print (poly.make_triangle.__doc__)
             if len(points) == 3:
                 poly.make_triangle(*points)
 
@@ -387,7 +387,6 @@ class STL():
         from CGAL.CGAL_Kernel import Point_3
         from CGAL.CGAL_Kernel import Vector_3
         from CGAL.CGAL_Kernel import Plane_3
-        from CGAL.CGAL_Kernel import Segment_3
         from CGAL.CGAL_Polyhedron_3 import Polyhedron_3
         from CGAL.CGAL_AABB_tree import AABB_tree_Polyhedron_3_Facet_handle
 
