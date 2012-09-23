@@ -8,7 +8,8 @@ class TestSTL(unittest.TestCase):
     """Test the STL"""
 
     def test_20mm_cube(self):
-        stl = STL(os.path.join(os.path.dirname(__file__),'20mmbox.stl'))
+        stl = STL(os.path.join(os.path.dirname(__file__),
+            'data', '20mmbox.stl'))
         #stl.debug = True
 
         type = stl.type()
@@ -22,7 +23,8 @@ class TestSTL(unittest.TestCase):
 
 
     def test_my_head(self):
-        stl = STL(os.path.join(os.path.dirname(__file__),'derekhead.stl'))
+        stl = STL(os.path.join(os.path.dirname(__file__),
+            'data', 'derekhead.stl'))
         type = stl.type()
         print "Type is: ", type
         if type == "binary":
@@ -30,6 +32,6 @@ class TestSTL(unittest.TestCase):
             print "Length is: ", stl.length()
         stl.read()
         self.assertEquals(type, 'binary')
-        self.assertEquals(stl.length, 33326)
+        self.assertEquals(stl.length(), 33326)
 
 

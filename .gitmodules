@@ -1,0 +1,3 @@
+[submodule "deps/cgal-bindings"]
+	path = deps/cgal-bindings
+	url = https://code.google.com/p/cgal-bindings

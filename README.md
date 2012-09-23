@@ -27,3 +27,19 @@ the following:
  - High speed optimized exterior sacrificial support
  - Corner velocity optimization via virtual G64
  - Perhaps it's own slicer eventually? . . . 
+ - 
+
+ ===========
+ Building...
+ ===========
+
+ This slicer/optimizer requires the CGAL bindings for Python, which are a bit
+ of a PITA to install correctly. In order to do so, you need to pull the 
+ git repo in the .gitmodule (it should happen automagically), then go into
+ the deps/cgal-bindings folder, then issue:
+ git checkout e77c16bd5a65 #For example on Ubuntu 12.04
+ to get the appropriate git version. Once this is done, you can build the
+ python bindings.
+
+ These swig bindings are used to generate fast planar slices of the 3d
+ stl models.

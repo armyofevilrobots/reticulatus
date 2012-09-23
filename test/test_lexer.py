@@ -12,11 +12,11 @@ N0003 G01 F10 X0Y0Z-0.01
 """
 
 with open(os.path.join(os.path.dirname(__file__),
-    '20mmbox.gcode'), 'r') as fp:
+    'data', '20mmbox.gcode'), 'r') as fp:
     GCODELARGE = fp.read()
 
 with open(os.path.join(os.path.dirname(__file__),
-    'derekhead.gcode'), 'r') as fp:
+    'data', 'derekhead.gcode'), 'r') as fp:
     GCODEHUGE = fp.read()
 
 class TestTokens(unittest.TestCase):
