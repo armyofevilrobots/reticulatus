@@ -8,6 +8,7 @@ class TestSTL(unittest.TestCase):
     """Test the STL"""
 
     def test_20mm_cube(self):
+        """Load a small model?"""
         stl = STL(os.path.join(os.path.dirname(__file__),
             'data', '20mmbox.stl'))
         #stl.debug = True
@@ -23,6 +24,7 @@ class TestSTL(unittest.TestCase):
 
 
     def test_my_head(self):
+        """Does it load a huge model OK?"""
         stl = STL(os.path.join(os.path.dirname(__file__),
             'data', 'derekhead.stl'))
         type = stl.type()
@@ -33,5 +35,16 @@ class TestSTL(unittest.TestCase):
         stl.read()
         self.assertEquals(type, 'binary')
         self.assertEquals(stl.length(), 33326)
+
+    def test_cgal_poly(self):
+        """Does it generate a POLY ok?"""
+        stl = STL(os.path.join(os.path.dirname(__file__),
+            'data', '20mmbox.stl'))
+        stl.read()
+        stl.to_cgal_polys()
+
+
+
+
 
 

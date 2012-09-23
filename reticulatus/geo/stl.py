@@ -33,18 +33,21 @@ class STL():
         Closes any open input file and open the one requested
         Resets any meta information associated with the input
         """
-        return
+        assert infile is not None
+        if self._readFD is not None:
+            self._readFD.close()
+        self._readFD = open (infile, "rb")
 
     ## setOutputType
     #
-    def setOutputType(self, type):
+    def setOutputType(self, otype):
         """
         Set the type of file that will be written. Valid types are:
         "binary" and "ascii"
         """
-        if type not in ["binary", "ascii"]:
+        if otype not in ["binary", "ascii"]:
             raise ValueError("Valid output file types are 'ascii' and 'binary'")
-        if type == "ascii":
+        if otype == "ascii":
             self.outIsBinary = False
         else:
             self.outIsBinary = True
@@ -112,12 +115,15 @@ class STL():
     #
     def __read_vertex(self):
         """
-        Read a 'vertex' line from an ascii input and return the result as a list of three points.
+        Read a 'vertex' line from an ascii input and return the result
+        as a list of three points.
         Raise an exception for unexpected input or EOF.
         """
         lparts = self._readFD.readline().strip().split()
         if lparts[0] != 'vertex':
-            raise ValueError('Found unexpected line <%s> when expecting vertex' % lparts)
+            raise ValueError(
+                    'Found unexpected line <%s> when expecting vertex' %
+                    lparts)
         return [float(lparts[1]), float(lparts[2]), float(lparts[3])]
 
     ## __ascii_read_triangle
@@ -147,12 +153,15 @@ class STL():
             # Same as end of file for our purposes
             raise EOFError
         if (lparts[0] != 'facet') or (lparts[1] != 'normal'):
-            raise ValueError('Found unexpected line <%s> when expecting facet' % line)
+            raise ValueError(
+                    'Found unexpected line <%s> when expecting facet' % line)
         n = [float(lparts[2]), float(lparts[3]), float(lparts[4])]
 
         # "outer loop"
         if self._readFD.readline().strip() != 'outer loop':
-            raise ValueError('Found unexpected line <%s> when expecting outer loop' % line)
+            raise ValueError(
+                    'Found unexpected line <%s> when expecting outer loop' %
+                    line)
 
         # Now the three vertices
         p1 = self.__read_vertex()
@@ -161,11 +170,15 @@ class STL():
 
         # "endloop"
         if self._readFD.readline().strip() != 'endloop':
-            raise ValueError('Found unexpected line <%s> when expecting endloop' % line)
+            raise ValueError(
+                    'Found unexpected line <%s> when expecting endloop' %
+                    line)
 
         # "endfacet"
         if self._readFD.readline().strip() != 'endfacet':
-            raise ValueError('Found unexpected line <%s> when expecting endfacet' % line)
+            raise ValueError(
+                    'Found unexpected line <%s> when expecting endfacet' %
+                    line)
 
         # ascii has no attibute
         b = 0
@@ -183,6 +196,7 @@ class STL():
     ## __determine_input_type()
     #
     def __determine_input_type(self):
+        """What type of file is this?"""
         binflag = False
         pos = self._readFD.tell()
 
@@ -195,8 +209,9 @@ class STL():
         if solidtest != tststr:
             binflag = True
 
-        # It could still be binary, as first 80 bytes is comment in a binary file
-        # each facet is 50 bytes, read one and test it to see if it's all ascii
+        # It could still be binary, as first 80 bytes is comment in a binary
+        # file each facet is 50 bytes, read one and test it to see if it's
+        # all ascii
         self._readFD.seek(80)
         facet = self._readFD.read(50)
         if not all(ord(c) < 128 for c in facet):
@@ -273,7 +288,8 @@ class STL():
             self.__determine_input_type()
 
         if self._isBinary == None:
-            raise ValueError("Unable to determine file type, is this an stl file?")
+            raise ValueError(
+                    "Unable to determine file type, is this an stl file?")
         elif self._isBinary:
             self._facets = []
             # Read all the binary vertices
@@ -291,7 +307,9 @@ class STL():
             self._readFD.seek(0)
             line = self._readFD.readline().strip()
             if not line.startswith('solid'):
-                raise ValueError('Found unexpected line <%s> when expecting solid' % line)
+                raise ValueError(
+                        'Found unexpected line <%s> when expecting solid' %
+                        line)
             try:
                 while True:
                     (n, p1, p2, p3, b) =  self.__ascii_read_triangle()
@@ -305,20 +323,22 @@ class STL():
 
     ## addFacet
     #
-    def addFacet(self, p, n=[0.0,0.0,0.0], a=0):
+    def addFacet(self, p, n=None, a=0):
         """
         Add a facet to the internal list. Normal defaults to all zeros. Attribute defaults to zero
         """
+        n = n or [0.0,0.0,0.0]
         self._facets.append([n, p, a])
         return
 
     ## addFace
     #
-    def addFace(self, pointlist, n=[0.0,0.0,0.0], a=0):
+    def addFace(self, pointlist, n=None, a=0):
         """
         Add a four point face to the internal list. Normal defaults to all zeros. Attribute defaults to zero
         Addition follows a right hand rule, assigning facets from points 1,2,3 then 1,3,4
         """
+        n = n or [0.0,0.0,0.0]
         self.addFacet([pointlist[0], pointlist[1], pointlist[2]])
         self.addFacet([pointlist[0], pointlist[2], pointlist[3]])
 
@@ -348,13 +368,26 @@ class STL():
         Takes this giant pile of edges/faces and generates CGAL polys.
         """
         from CGAL.CGAL_Kernel import Point_3
+        from CGAL.CGAL_Polyhedron_3 import Polyhedron_3
+        import sys
+        poly = Polyhedron_3()
+        for facet in self._facets:
+            points = [Point_3(*point) for point in facet['p']]
+            print points
+            print (poly.make_triangle.__doc__)
+            if len(points) == 3:
+                poly.make_triangle(*points)
+
+
+    def generate_planar_sections(self, start_height, inc_height):
+        """Generates a series of slices from height start_height and then
+        every additional inc_height units."""
+        from CGAL.CGAL_Kernel import Point_3
         from CGAL.CGAL_Kernel import Vector_3
         from CGAL.CGAL_Kernel import Plane_3
         from CGAL.CGAL_Kernel import Segment_3
         from CGAL.CGAL_Polyhedron_3 import Polyhedron_3
         from CGAL.CGAL_AABB_tree import AABB_tree_Polyhedron_3_Facet_handle
-        poly = Polyhedron_3()
-        for facet in self._facets:
-            print facet
-            poly.make_triangle()
+
+
 
