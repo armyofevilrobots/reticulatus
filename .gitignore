@@ -3,7 +3,9 @@
 *.pyc
 *.zip
 include/
+build/
 bin/
 lib/
 local/
+man/
 
