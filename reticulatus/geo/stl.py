@@ -1,4 +1,7 @@
-""" This is blatantly stolen from https://github.com/sconklin/stlutils"""
+""" This is blatantly stolen from https://github.com/sconklin/stlutils
+Big thanks to https://github.com/sconklin for licensing this as GPLv3
+so that I can use it in this project.
+"""
 import struct
 
 class STL():

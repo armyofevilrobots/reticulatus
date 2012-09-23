@@ -17,17 +17,36 @@
 Reticulatus : A Python Reprap G-Code mangler
 ============================================
 
-This is a project that will (soon) provide gcode post-processing, including
-the following:
+This is a project that will (soon) provide fast 3d object skeining.
+The goal of this project is to provide a minimal set of reusable
+slicing tools that are very robust, fast, and repeatable.
 
- - Shallow dome perimeter gap filling
- - Smooth transitions between layers (ramping)
- - Structural ribbing on interial walls
- - Optimized (voronoi/delaunay) infill on perimeter only objects
- - High speed optimized exterior sacrificial support
- - Corner velocity optimization via virtual G64
- - Perhaps it's own slicer eventually? . . . 
- - 
+While there are other great projects out there, including skeinforge
+and Slic3r, neither of them meets my need to be able to fine tune
+toolpaths and fill strategies, and/or are written in languages that
+are far enough outside of my expertise to be productive. I also spent
+a fair bit of time researching various methods of slicing and skeining
+so that I could get the most bang with the least effort. Productivity
+through pathological laziness!
+
+Currently working:
+    - STL parsing (thanks https://github.com/sconklin!)
+    - Conversion of STL to CGAL polymesh
+    - CGAL polymesh to layered planar perimeters
+
+Coming soon:
+    - Planar perimeter inset based on tool width
+    - Multiple perimeters
+    - Cross hatched infill
+
+Longer term:
+    - Shallow dome perimeter gap filling
+    - Smooth transitions between layers (ramping)
+    - Structural ribbing on interial walls
+    - Optimized (voronoi/delaunay) infill on perimeter only objects
+    - High speed optimized exterior sacrificial support
+    - Corner velocity optimization via virtual G64
+    - Post processing existing gcode
 
  ===========
  Building...
