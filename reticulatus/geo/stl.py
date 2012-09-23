@@ -378,8 +378,10 @@ class STL():
             if len(points) == 3:
                 poly.make_triangle(*points)
 
+        return poly
 
-    def generate_planar_sections(self, start_height, inc_height):
+
+    def generate_planar_intersections(self, start_height, inc_height, max_height):
         """Generates a series of slices from height start_height and then
         every additional inc_height units."""
         from CGAL.CGAL_Kernel import Point_3
@@ -388,6 +390,25 @@ class STL():
         from CGAL.CGAL_Kernel import Segment_3
         from CGAL.CGAL_Polyhedron_3 import Polyhedron_3
         from CGAL.CGAL_AABB_tree import AABB_tree_Polyhedron_3_Facet_handle
+
+        poly = self.to_cgal_polys()
+
+        #This is a CGAL tree that makes for fast slicening!
+        tree = AABB_tree_Polyhedron_3_Facet_handle(poly.facets())
+        zpos = start_height
+        # This should _really_ be the max height from a bounding box eh?
+        layers = list()
+        while zpos < max_height:
+            vec = Vector_3(0, 0, 1)
+            plane_query = Plane_3(Point_3(0, 0, zpos), vec)
+            intersections = list()
+            tree.all_intersections(plane_query, intersections)
+            layers.append((zpos, intersections))
+            zpos += inc_height
+        return layers
+
+
+
 
 
 

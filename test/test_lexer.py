@@ -63,7 +63,7 @@ class TestTokens(unittest.TestCase):
         """Test the 20mm calibration cube in the parser"""
         toklist = self._tok(GCODELARGE)
 
-    def test_huge_gcode(self):
+    def _test_huge_gcode(self):
         """Test the derekhead in the parser"""
         toklist = self._tok(GCODEHUGE)
 

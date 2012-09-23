@@ -43,6 +43,28 @@ class TestSTL(unittest.TestCase):
         stl.read()
         stl.to_cgal_polys()
 
+    def test_slicing(self):
+        """Test initial slicer prototype"""
+        stl = STL(os.path.join(os.path.dirname(__file__),
+            'data', 'derekhead.stl'))
+        stl.read()
+        layers = stl.generate_planar_intersections(0.4, 1, 31)
+
+        for (zlevel, intersections) in layers:
+            if len(intersections):
+                print "LAYER: ", zlevel
+            for intersection in intersections:
+                obj = intersection[0]
+                if obj.is_Segment_3():
+                    segment = obj.get_Segment_3()
+                    #print "Line intersection", segment
+                    print "Line from: ", segment.source(), "to", segment.target()
+
+
+
+
+        assert False
+
 
 
 
