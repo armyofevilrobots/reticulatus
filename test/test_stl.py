@@ -7,20 +7,18 @@ import unittest
 class TestSTL(unittest.TestCase):
     """Test the STL"""
 
-    def test_20mm_cube(self):
+    def test_20mm_cube_asc(self):
         """Load a small model?"""
         stl = STL(os.path.join(os.path.dirname(__file__),
-            'data', '20mmbox.stl'))
-        #stl.debug = True
+            'data', '20mmboxasc.stl'))
+        stl.debug = True
 
         type = stl.type()
         print "Type is: ", type
-        if type == "binary":
-            print "Length is: ", stl.length()
-            print "Header:"
-            print stl.header()
-        self.assertEquals(type, 'binary')
+        self.assertEquals(type, 'ascii')
         stl.read()
+        stl.dump()
+        assert False
 
 
     def test_my_head(self):

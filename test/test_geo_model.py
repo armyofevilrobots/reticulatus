@@ -1,31 +1,20 @@
-from reticulatus.geo.stl import STL
+"""Tests the Model"""
 from reticulatus.geo.model import Model
-import os
 import unittest
+import helpers
 
 class TestModel(unittest.TestCase):
     """Test the Model"""
 
-    def _get_box(self):
-        stl = STL(os.path.join(os.path.dirname(__file__),
-            'data', '20mmbox.stl'))
-        stl.read()
-        return stl
-
-    def _get_head(self):
-        stl = STL(os.path.join(os.path.dirname(__file__),
-            'data', 'derekhead.stl'))
-        stl.read()
-        return stl
-
     def test_stl2model(self):
-        stl = self._get_box()
+        """Test loading an stl and making a model"""
+        stl = helpers.get_box()
         model = Model.from_stl(stl)
         print model
 
     def test_slicing(self):
         """Test initial slicer prototype"""
-        stl = self._get_head()
+        stl = helpers.get_box()
         model = Model.from_stl(stl)
         layers = model.generate_planar_intersections(0.4, 1, 31)
 
@@ -36,12 +25,11 @@ class TestModel(unittest.TestCase):
                 obj = intersection[0]
                 if obj.is_Segment_3():
                     segment = obj.get_Segment_3()
-                    #print "Line intersection", segment
-                    #print "Line from: ", segment.source(), "to", segment.target()
                     start = segment.source()
                     end = segment.target()
-                    #print "HXYZ: ",start.x(), start.y(), start.z()
-        #assert False
+                    assert start != end
+        assert False
+
 
 
 

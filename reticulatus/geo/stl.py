@@ -79,7 +79,10 @@ class STL():
         """
         data = self._readFD.read(count*4)
         formatstr = "<%df" % count
-        return struct.unpack(formatstr, data)
+        out = struct.unpack(formatstr, data)
+        #print "OUT IS", out
+        return out
+
 
     ## __unpack_attribute
     #
@@ -107,9 +110,9 @@ class STL():
         if self.debug:
             print "Read binary Triangle:"
             print "  Normal: %f %f %f" % (n[0], n[1], n[2])
-            print "  P1:     %f %f %f" % (p1[0], p1[1], p1[2])
-            print "  P2:     %f %f %f" % (p2[0], p2[1], p2[2])
-            print "  P3:     %f %f %f" % (p3[0], p3[1], p3[2])
+            print "  P1:     %5.5f %5.5f %5.5f" % (p1[0], p1[1], p1[2])
+            print "  P2:     %5.5f %5.5f %5.5f" % (p2[0], p2[1], p2[2])
+            print "  P3:     %5.5f %5.5f %5.5f" % (p3[0], p3[1], p3[2])
             print "  Attr:   0x%X" % b
 
         return (n, p1, p2, p3, b)
@@ -123,6 +126,7 @@ class STL():
         Raise an exception for unexpected input or EOF.
         """
         lparts = self._readFD.readline().strip().split()
+        #print "FOUND LPARTS", lparts
         if lparts[0] != 'vertex':
             raise ValueError(
                     'Found unexpected line <%s> when expecting vertex' %
@@ -315,10 +319,12 @@ class STL():
                         line)
             try:
                 while True:
+                    facet = dict()
                     (n, p1, p2, p3, b) =  self.__ascii_read_triangle()
                     facet['n'] = n
                     facet['p'] = [p1, p2, p3]
                     facet['a'] = b
+                    #print "Found facet: ", facet
                     self._facets.append(facet)
             except EOFError:
                 pass
