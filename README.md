@@ -30,23 +30,23 @@ so that I could get the most bang with the least effort. Productivity
 through pathological laziness!
 
 Currently working:
-    - STL parsing (thanks https://github.com/sconklin!)
-    - Conversion of STL to CGAL polymesh
-    - CGAL polymesh to layered planar perimeters
+ - STL parsing (thanks https://github.com/sconklin!)
+ - Conversion of STL to CGAL polymesh
+ - CGAL polymesh to layered planar perimeters
 
 Coming soon:
-    - Planar perimeter inset based on tool width
-    - Multiple perimeters
-    - Cross hatched infill
+ - Planar perimeter inset based on tool width
+ - Multiple perimeters
+ - Cross hatched infill
 
 Longer term:
-    - Shallow dome perimeter gap filling
-    - Smooth transitions between layers (ramping)
-    - Structural ribbing on interial walls
-    - Optimized (voronoi/delaunay) infill on perimeter only objects
-    - High speed optimized exterior sacrificial support
-    - Corner velocity optimization via virtual G64
-    - Post processing existing gcode
+ - Shallow dome perimeter gap filling
+ - Smooth transitions between layers (ramping)
+ - Structural ribbing on interial walls
+ - Optimized (voronoi/delaunay) infill on perimeter only objects
+ - High speed optimized exterior sacrificial support
+ - Corner velocity optimization via virtual G64
+ - Post processing existing gcode
 
  ===========
  Building...
