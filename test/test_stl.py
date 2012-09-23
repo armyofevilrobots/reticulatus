@@ -36,33 +36,32 @@ class TestSTL(unittest.TestCase):
         self.assertEquals(type, 'binary')
         self.assertEquals(stl.length(), 33326)
 
-    def test_cgal_poly(self):
-        """Does it generate a POLY ok?"""
-        stl = STL(os.path.join(os.path.dirname(__file__),
-            'data', '20mmbox.stl'))
-        stl.read()
-        stl.to_cgal_polys()
+    #def test_cgal_poly(self):
+        #"""Does it generate a POLY ok?"""
+        #stl = STL(os.path.join(os.path.dirname(__file__),
+            #'data', '20mmbox.stl'))
+        #stl.read()
+        #stl.to_cgal_poly()
 
-    def test_slicing(self):
-        """Test initial slicer prototype"""
-        stl = STL(os.path.join(os.path.dirname(__file__),
-            'data', 'derekhead.stl'))
-        stl.read()
-        layers = stl.generate_planar_intersections(0.4, 1, 31)
+    #def test_slicing(self):
+        #"""Test initial slicer prototype"""
+        #stl = STL(os.path.join(os.path.dirname(__file__),
+            #'data', 'derekhead.stl'))
+        #stl.read()
+        #layers = stl.generate_planar_intersections(0.4, 1, 31)
 
-        for (zlevel, intersections) in layers:
-            if len(intersections):
-                print "LAYER: ", zlevel
-            for intersection in intersections:
-                obj = intersection[0]
-                if obj.is_Segment_3():
-                    segment = obj.get_Segment_3()
-                    #print "Line intersection", segment
-                    #print "Line from: ", segment.source(), "to", segment.target()
-                    start = segment.source()
-                    end = segment.target()
-                    print "HXYZ: ",start.x(), start.y(), start.z()
-        assert False
+        #for (zlevel, intersections) in layers:
+            #if len(intersections):
+                #print "LAYER: ", zlevel
+            #for intersection in intersections:
+                #obj = intersection[0]
+                #if obj.is_Segment_3():
+                    #segment = obj.get_Segment_3()
+                    ##print "Line intersection", segment
+                    ##print "Line from: ", segment.source(), "to", segment.target()
+                    #start = segment.source()
+                    #end = segment.target()
+                    ##print "HXYZ: ",start.x(), start.y(), start.z()
 
 
 
