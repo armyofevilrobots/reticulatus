@@ -26,3 +26,4 @@ the following:
  - Optimized (voronoi/delaunay) infill on perimeter only objects
  - High speed optimized exterior sacrificial support
  - Corner velocity optimization via virtual G64
+ - Perhaps it's own slicer eventually? . . . 

@@ -1,6 +1,7 @@
 """Test lexer"""
 from reticulatus.parser import tokens
 from reticulatus.parser import lexer
+import os
 
 import unittest
 
@@ -9,6 +10,14 @@ N0001 G91
 N0002 G02 X0 Y0.001
 N0003 G01 F10 X0Y0Z-0.01
 """
+
+with open(os.path.join(os.path.dirname(__file__),
+    '20mmbox.gcode'), 'r') as fp:
+    GCODELARGE = fp.read()
+
+with open(os.path.join(os.path.dirname(__file__),
+    'derekhead.gcode'), 'r') as fp:
+    GCODEHUGE = fp.read()
 
 class TestTokens(unittest.TestCase):
     """Test the lexer"""
@@ -49,5 +58,13 @@ class TestTokens(unittest.TestCase):
                     ('VEC', 'Y0'),
                     ('VEC', 'Z-0.01')
                 ])
+
+    def test_large_gcode(self):
+        """Test the 20mm calibration cube in the parser"""
+        toklist = self._tok(GCODELARGE)
+
+    def test_huge_gcode(self):
+        """Test the derekhead in the parser"""
+        toklist = self._tok(GCODEHUGE)
 
 
