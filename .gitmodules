@@ -1,3 +1,0 @@
-[submodule "deps/slicer"]
-	path = deps/slicer
-	url = https://github.com/Slicer/Slicer.git
