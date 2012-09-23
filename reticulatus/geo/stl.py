@@ -366,19 +366,6 @@ class STL():
             print "  P3:     %f %f %f" % (p3[0], p3[1], p3[2])
             print "  Attr:   0x%X" % a
 
-    #def to_cgal_poly(self):
-        #"""
-        #Takes this giant pile of edges/faces and generates CGAL polys.
-        #"""
-        #from CGAL.CGAL_Kernel import Point_3
-        #from CGAL.CGAL_Polyhedron_3 import Polyhedron_3
-        #import sys
-        #poly = Polyhedron_3()
-        #for facet in self._facets:
-            #points = [Point_3(*point) for point in facet['p']]
-            #if len(points) == 3:
-                #poly.make_triangle(*points)
-        #return poly
 
 
 
