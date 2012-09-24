@@ -10,7 +10,6 @@ class TestModel(unittest.TestCase):
         """Test loading an stl and making a model"""
         stl = helpers.get_box()
         model = Model.from_stl(stl)
-        print model
 
     def test_slicing(self):
         """Test initial slicer prototype"""
@@ -19,8 +18,6 @@ class TestModel(unittest.TestCase):
         layers = model.generate_planar_intersections(0.4, 1, 31)
 
         for (zlevel, intersections) in layers:
-            if len(intersections):
-                print "LAYER: ", zlevel
             for intersection in intersections:
                 obj = intersection[0]
                 if obj.is_Segment_3():
@@ -28,7 +25,6 @@ class TestModel(unittest.TestCase):
                     start = segment.source()
                     end = segment.target()
                     assert start != end
-        assert False
 
 
 

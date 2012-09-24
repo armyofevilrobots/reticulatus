@@ -20,6 +20,11 @@ class STL():
     _header      = None
     _length      = None
 
+
+    @property
+    def facets(self):
+        return self._facets
+
     ## __init__
     #
     def __init__(self, infile = None, outfile = None):

@@ -20,7 +20,6 @@ class TestLayer(unittest.TestCase):
         ctx.scale (1024, 1024)
         ctx.set_source_rgb (0.8, 0.2, 0.5)
         for facet in stl._facets:
-            #print "FACET", facet['p']
             x,y,z = facet['p'][0]
             ctx.move_to(0.5+x/30, 0.5+y/30)
 
@@ -28,7 +27,7 @@ class TestLayer(unittest.TestCase):
             ctx.line_to(0.5+x/30,0.5+y/30)
             x,y,z = facet['p'][2]
             ctx.line_to(0.5+x/30,0.5+y/30)
-        ctx.set_line_width (0.01)
+        ctx.set_line_width (0.001)
         ctx.stroke()
 
         outpath = os.path.join(
@@ -38,7 +37,7 @@ class TestLayer(unittest.TestCase):
 
         model = Model.from_stl(stl)
         #layers = model.generate_planar_intersections(-0, 1, 10)
-        layers = model.generate_planar_intersections(0, 0.1, 30)
+        layers = model.generate_planar_intersections(0, 0.5, 30)
 
         for (zlevel, intersections) in layers:
             surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1024, 1024)
@@ -70,11 +69,7 @@ class TestLayer(unittest.TestCase):
             surf.write_to_png(outpath)
 
             layer = Layer.from_CGAL_intersections(intersections)
-            #print layer
-            print "Perimeter", [poly for poly in layer.polys]
-            eroded = [poly.eroded(0.2) for poly in layer.polys]
-            print "Eroded", eroded
-        assert False
+            #eroded = [poly.eroded(0.2) for poly in layer.polys]
 
 
 

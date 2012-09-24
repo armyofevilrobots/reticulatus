@@ -12,13 +12,10 @@ class TestSTL(unittest.TestCase):
         stl = STL(os.path.join(os.path.dirname(__file__),
             'data', '20mmboxasc.stl'))
         stl.debug = True
-
         type = stl.type()
-        print "Type is: ", type
         self.assertEquals(type, 'ascii')
         stl.read()
         stl.dump()
-        assert False
 
 
     def test_my_head(self):
@@ -26,7 +23,6 @@ class TestSTL(unittest.TestCase):
         stl = STL(os.path.join(os.path.dirname(__file__),
             'data', 'derekhead.stl'))
         type = stl.type()
-        print "Type is: ", type
         if type == "binary":
             print stl.header()
             print "Length is: ", stl.length()
