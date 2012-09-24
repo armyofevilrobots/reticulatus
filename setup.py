@@ -1,21 +1,19 @@
 """Setup stub for reticulatus"""
 
 from setuptools import setup, find_packages
-import sys, os
+import sys
 
 VERSION = '0.0'
+REQUIRES = [ 'configobj', 'futures']
+
+if float(sys.version[:3]) < 2.7:
+    REQUIRES.append('argparse')
 
 setup(name='reticulatus',
       VERSION=VERSION,
-      description="Post-processor for 3d printing G-code.",
-      long_description="""\
-Performs various cleanups including:
- - Fixing gaps in shallow domes or low angle top surfaces
- - Intelligent support structure for internal/external overhangs
- - Ramping and arced entries to extrusions
- - Predictive Hooke's law extrusion starts
- - Other things I haven't thought of yet.
-""",
+      description="Another slicer, in python, and fast!",
+      long_description="""High speed python based slicer,
+      with NO skeinforge dependencies.""",
       classifiers=[],
       keywords='reprap cnc gcode slic3r skeinforge',
       author='Derek Anderson',
@@ -24,12 +22,11 @@ Performs various cleanups including:
       license='GPLv3',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,
-      zip_safe=True,
-      install_requires=[
-          'numpy',
-          # -*- Extra requirements: -*-
-      ],
-      entry_points="""
-      # -*- Entry points: -*-
-      """,
+      zip_safe = True,
+      install_requires = REQUIRES,
+      entry_points={
+          'console_scripts': [
+              'reticulate = reticulatus.scripts.reticulate:main',
+              ]
+          }
       )

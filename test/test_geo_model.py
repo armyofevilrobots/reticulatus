@@ -19,12 +19,8 @@ class TestModel(unittest.TestCase):
 
         for (zlevel, intersections) in layers:
             for intersection in intersections:
-                obj = intersection[0]
-                if obj.is_Segment_3():
-                    segment = obj.get_Segment_3()
-                    start = segment.source()
-                    end = segment.target()
-                    assert start != end
+                start, end = intersection
+                assert start != end
 
 
 

@@ -47,21 +47,19 @@ class TestLayer(unittest.TestCase):
             if len(intersections) == 0:
                 continue
             for intersection in intersections:
-                obj = intersection[0]
-                if obj.is_Segment_3():
-                    segment = obj.get_Segment_3()
-                    start = (
-                            0.5+round(segment.source().x()/20, 4),
-                            0.5+round(segment.source().y()/20, 4)
-                            )
-                    end = (
-                            0.5+round(segment.target().x()/20, 4),
-                            0.5+round(segment.target().y()/20, 4)
-                            )
-                    ctx.move_to(*start)
-                    ctx.line_to(*end)
-                    ctx.set_line_width (0.003)
-                    ctx.stroke ()
+                begin, last = intersection
+                start = (
+                        0.5+round(begin[0]/20, 4),
+                        0.5+round(begin[1]/20, 4)
+                        )
+                end = (
+                        0.5+round(last[0]/20, 4),
+                        0.5+round(last[1]/20, 4)
+                        )
+                ctx.move_to(*start)
+                ctx.line_to(*end)
+                ctx.set_line_width (0.003)
+                ctx.stroke ()
 
             outpath = os.path.join(
                 os.path.dirname(__file__),
