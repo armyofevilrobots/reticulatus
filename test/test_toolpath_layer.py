@@ -5,9 +5,43 @@ import os
 import unittest
 import helpers
 import cairo
+import time
+from multiprocessing import Pool, cpu_count
 
+from reticulatus.worker import Worker
 from reticulatus.geo.model import Model
 from reticulatus.toolpath.layer import Layer
+
+
+
+def generate_cairo_map(layer):
+    zlevel,intersections = layer
+
+    surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1024, 1024)
+    ctx = cairo.Context (surf)
+    ctx.scale (1024, 1024)
+    ctx.set_source_rgb (0.3, 0.3, 0.5)
+    if len(intersections) == 0:
+        return
+    for intersection in intersections:
+        begin, last = intersection
+        start = (
+                0.5+round(begin[0]/20, 4),
+                0.5+round(begin[1]/20, 4)
+                )
+        end = (
+                0.5+round(last[0]/20, 4),
+                0.5+round(last[1]/20, 4)
+                )
+        ctx.move_to(*start)
+        ctx.line_to(*end)
+        ctx.set_line_width (0.003)
+        ctx.stroke ()
+
+    outpath = os.path.join(
+        os.path.dirname(__file__),
+        'out', 'layer%2.5f.png' % zlevel)
+    surf.write_to_png(outpath)
 
 class TestLayer(unittest.TestCase):
     """Test the Layer"""
@@ -37,37 +71,19 @@ class TestLayer(unittest.TestCase):
 
         model = Model.from_stl(stl)
         #layers = model.generate_planar_intersections(-0, 1, 10)
-        layers = model.generate_planar_intersections(0, 0.5, 30)
+        now=time.time()
+        layers = model.generate_planar_intersections(0, 0.1, 30, processes=1)
+        print "That took %5.5f seconds" % (time.time()-now)
 
-        for (zlevel, intersections) in layers:
-            surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1024, 1024)
-            ctx = cairo.Context (surf)
-            ctx.scale (1024, 1024)
-            ctx.set_source_rgb (0.3, 0.3, 0.5)
-            if len(intersections) == 0:
-                continue
-            for intersection in intersections:
-                begin, last = intersection
-                start = (
-                        0.5+round(begin[0]/20, 4),
-                        0.5+round(begin[1]/20, 4)
-                        )
-                end = (
-                        0.5+round(last[0]/20, 4),
-                        0.5+round(last[1]/20, 4)
-                        )
-                ctx.move_to(*start)
-                ctx.line_to(*end)
-                ctx.set_line_width (0.003)
-                ctx.stroke ()
 
-            outpath = os.path.join(
-                os.path.dirname(__file__),
-                'out', 'layer%2.5f.png' % zlevel)
-            surf.write_to_png(outpath)
 
-            layer = Layer.from_CGAL_intersections(intersections)
-            #eroded = [poly.eroded(0.2) for poly in layer.polys]
+        #layer = Layer.from_CGAL_intersections(intersections)
+        #eroded = [poly.eroded(0.2) for poly in layer.polys]
+        p = Pool(cpu_count()*4)
+
+        now = time.time()
+        p.map(generate_cairo_map, layers)
+        print "That took %5.5f seconds" % (time.time()-now)
 
 
 

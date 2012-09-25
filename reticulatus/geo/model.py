@@ -5,8 +5,8 @@ from CGAL.CGAL_Kernel import Plane_3, Vector_3, Point_3
 from CGAL.CGAL_Polyhedron_3 import Polyhedron_3
 from CGAL.CGAL_AABB_tree import AABB_tree_Polyhedron_3_Facet_handle
 import logging
-from multiprocessing import cpu_count
 from futures import ThreadPoolExecutor, ProcessPoolExecutor
+from reticulatus.worker import Worker
 
 LOGGER = logging.getLogger(__file__)
 
@@ -56,7 +56,7 @@ class Model:
 
 
     def generate_planar_intersections(self,
-            start_height, inc_height, max_height, accuracy=4):
+            start_height, inc_height, max_height, accuracy=4, processes=None):
         """Generates a series of slices from height start_height and then
         every additional inc_height units."""
         #This is a CGAL tree that makes for fast slicening!
