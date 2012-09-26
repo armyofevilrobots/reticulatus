@@ -85,16 +85,13 @@ class Model:
             return (zpos,
                 self._intersection_to_segments(intersections, accuracy) )
 
-        #layers = list()
-        #pool = ThreadPoolExecutor(2)
         #Surprise surprise, this is faster single threaded :(
         #I'll have to modify things to be runnable in a sub func,
         #Or maybe write my own process wrapper
         layers = map(_slice, zrange(start_height, inc_height, max_height))
 
-        #while zpos < max_height:
-            #layers.append( (zpos,
-                #self._intersection_to_segments(intersections, accuracy)) )
-            #zpos += inc_height
         return layers
+
+
+
 

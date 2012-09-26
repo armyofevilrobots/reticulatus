@@ -15,7 +15,14 @@ class Layer:
         self.polys = polys
 
     def eroded(self, distance):
-        return Layer(self.polys.buffer(-distance))
+        """Generates eroded polys"""
+        newpolys = list()
+        for poly in self.polys:
+            newpoly = poly.buffer(-distance)
+            if newpoly:
+                newpolys.append(newpoly)
+        return Layer(newpolys)
+
 
     @classmethod
     def from_lines(cls, lines):
