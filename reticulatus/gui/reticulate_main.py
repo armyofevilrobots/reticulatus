@@ -1,0 +1,92 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'reticulate_main.ui'
+#
+# Created: Thu Sep 27 22:58:00 2012
+#      by: pyside-uic 0.2.13 running on PySide 1.1.0
+#
+# WARNING! All changes made in this file will be lost!
+
+from PySide import QtCore, QtGui
+
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(800, 600)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
+        MainWindow.setSizePolicy(sizePolicy)
+        self.centralwidget = QtGui.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.gridLayout = QtGui.QGridLayout(self.centralwidget)
+        self.gridLayout.setObjectName("gridLayout")
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtGui.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 23))
+        self.menubar.setObjectName("menubar")
+        self.menuFile = QtGui.QMenu(self.menubar)
+        self.menuFile.setObjectName("menuFile")
+        self.menuEdit = QtGui.QMenu(self.menubar)
+        self.menuEdit.setObjectName("menuEdit")
+        self.menu_Settings = QtGui.QMenu(self.menubar)
+        self.menu_Settings.setObjectName("menu_Settings")
+        self.menu_Help = QtGui.QMenu(self.menubar)
+        self.menu_Help.setObjectName("menu_Help")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtGui.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+        self.action_file = QtGui.QAction(MainWindow)
+        self.action_file.setObjectName("action_file")
+        self.action_New = QtGui.QAction(MainWindow)
+        self.action_New.setObjectName("action_New")
+        self.action_Open = QtGui.QAction(MainWindow)
+        self.action_Open.setObjectName("action_Open")
+        self.action_Save = QtGui.QAction(MainWindow)
+        self.action_Save.setObjectName("action_Save")
+        self.action_Quit = QtGui.QAction(MainWindow)
+        self.action_Quit.setObjectName("action_Quit")
+        self.action_Printer = QtGui.QAction(MainWindow)
+        self.action_Printer.setObjectName("action_Printer")
+        self.actionS_licing = QtGui.QAction(MainWindow)
+        self.actionS_licing.setObjectName("actionS_licing")
+        self.action_Help = QtGui.QAction(MainWindow)
+        self.action_Help.setObjectName("action_Help")
+        self.action_About = QtGui.QAction(MainWindow)
+        self.action_About.setObjectName("action_About")
+        self.menuFile.addAction(self.action_New)
+        self.menuFile.addAction(self.action_Open)
+        self.menuFile.addAction(self.action_Save)
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.action_Quit)
+        self.menu_Settings.addAction(self.action_Printer)
+        self.menu_Settings.addAction(self.actionS_licing)
+        self.menu_Help.addAction(self.action_Help)
+        self.menu_Help.addSeparator()
+        self.menu_Help.addAction(self.action_About)
+        self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuEdit.menuAction())
+        self.menubar.addAction(self.menu_Settings.menuAction())
+        self.menubar.addAction(self.menu_Help.menuAction())
+
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "MainWindow", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "&File", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuEdit.setTitle(QtGui.QApplication.translate("MainWindow", "&Edit", None, QtGui.QApplication.UnicodeUTF8))
+        self.menu_Settings.setTitle(QtGui.QApplication.translate("MainWindow", "&Settings", None, QtGui.QApplication.UnicodeUTF8))
+        self.menu_Help.setTitle(QtGui.QApplication.translate("MainWindow", "&Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_file.setText(QtGui.QApplication.translate("MainWindow", "&file", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_New.setText(QtGui.QApplication.translate("MainWindow", "&New", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Open.setText(QtGui.QApplication.translate("MainWindow", "&Open", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Save.setText(QtGui.QApplication.translate("MainWindow", "&Save", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Quit.setText(QtGui.QApplication.translate("MainWindow", "&Quit", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Printer.setText(QtGui.QApplication.translate("MainWindow", "&Printer", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionS_licing.setText(QtGui.QApplication.translate("MainWindow", "S&licing", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Help.setText(QtGui.QApplication.translate("MainWindow", "&Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_About.setText(QtGui.QApplication.translate("MainWindow", "&About", None, QtGui.QApplication.UnicodeUTF8))
+
