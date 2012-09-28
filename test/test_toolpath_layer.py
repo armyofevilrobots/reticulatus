@@ -84,8 +84,9 @@ def draw_cairo_polys(polys, surf, color):
 class TestLayer(unittest.TestCase):
     """Test the Layer"""
 
-    def test_generate_layers(self):
+    def test_00_generate_layers(self):
         """Generate some layers and validate them"""
+        print "\nGenerating a set of simple slices on my head."
         stl = helpers.get_head()
         surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1024, 1024)
         ctx = cairo.Context (surf)
@@ -111,16 +112,17 @@ class TestLayer(unittest.TestCase):
         #layers = model.generate_planar_intersections(-0, 1, 10)
         now=time.time()
         layers = model.generate_planar_intersections(0, 0.1, 30, processes=1)
-        print "That took %5.5f seconds" % (time.time()-now)
+        print "Simple planar intersections: That took %5.5f seconds" % (time.time()-now)
         p = Pool(cpu_count()*4)
 
         now = time.time()
         p.map(generate_cairo_map, layers)
-        print "That took %5.5f seconds" % (time.time()-now)
+        print "Generating output hires PNG files took %5.5f seconds" % (time.time()-now)
 
 
-    def test_generate_insets(self):
+    def test_01_generate_insets(self):
         """Generate some layers and inset them"""
+        print "\nUltra simple box model, planar inset testing."
         stl = helpers.get_box()
         model = Model.from_stl(stl)
         now=time.time()
@@ -142,8 +144,10 @@ class TestLayer(unittest.TestCase):
         print "Generating eroded layer planes took %5.5f seconds" % (time.time()-now)
 
 
-    def test_complex_insets(self):
+    def test_02_complex_insets(self):
         """Test a complicated set of insets, on the head model."""
+        print "\nPerforming a series of profiling and insetting, " \
+                "on a model of rantenki's head."
         stl = helpers.get_head()
         model = Model.from_stl(stl)
         now=time.time()
@@ -152,7 +156,20 @@ class TestLayer(unittest.TestCase):
                     plane in
                     model.generate_planar_intersections(0, 0.1, 30)
                     if len(plane[1])]
+        print "Generating slices for %d layers took %3.3f seconds." % (len(layers), time.time()-now)
 
+
+
+        now = time.time()
+        for layer in layers:
+            polys = list(layer[1].polys)
+
+            for erosion in [0.15, 0.3, .45]:
+                eroded = [poly.buffer(-erosion) for poly in polys]
+        print "Insetting perimeters for 3 loops for %d layers took %3.3f seconds." % (len(layers), time.time()-now)
+
+
+        now = time.time()
         for layer in layers:
             outpath = os.path.join(
                 os.path.dirname(__file__),
@@ -169,7 +186,7 @@ class TestLayer(unittest.TestCase):
                 for internal in poly.interiors:
                     draw_cairo_polys(internal, surf, (0.2, 0.2, 2*erosion, 1))
             surf.write_to_png(outpath)
-
+        print "Generating hires pngs of the sliced/inset layers took %3.3f seconds." % (time.time()-now)
 
 
 
