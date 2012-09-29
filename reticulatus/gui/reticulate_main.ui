@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>634</width>
-    <height>835</height>
+    <width>636</width>
+    <height>560</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,63 +26,43 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QSplitter" name="splitter">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QTabWidget" name="object_tabs">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+      <property name="currentIndex">
+       <number>1</number>
       </property>
-      <widget class="QTabWidget" name="object_tabs">
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="object_3d">
-        <attribute name="title">
-         <string>3D Object</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="gcode">
-        <attribute name="title">
-         <string>GCode</string>
-        </attribute>
-       </widget>
+      <widget class="QWidget" name="object_3d">
+       <attribute name="title">
+        <string>3D Object</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="object_3d_hlayout">
+        <item>
+         <widget class="QWidget" name="gl_widget" native="true"/>
+        </item>
+       </layout>
       </widget>
-      <widget class="QToolBox" name="tool_box">
-       <property name="currentIndex">
-        <number>1</number>
+      <widget class="QWidget" name="gcode">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <widget class="QWidget" name="layers">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>169</width>
-          <height>714</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Layers</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="tools">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>169</width>
-          <height>714</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Tools</string>
-        </attribute>
-       </widget>
+       <attribute name="title">
+        <string>GCode</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="gcode_hlayout">
+        <item>
+         <widget class="QTextEdit" name="gcode_editor"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -93,7 +73,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>634</width>
+     <width>636</width>
      <height>23</height>
     </rect>
    </property>
@@ -139,6 +119,66 @@
    <property name="sizeGripEnabled">
     <bool>true</bool>
    </property>
+  </widget>
+  <widget class="QDockWidget" name="dock_widget">
+   <property name="minimumSize">
+    <size>
+     <width>150</width>
+     <height>300</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>1024</width>
+     <height>1024</height>
+    </size>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dock_contents">
+    <layout class="QHBoxLayout" name="dock_hlayout">
+     <item>
+      <widget class="QToolBox" name="tool_box">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="layers">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>264</width>
+          <height>413</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Layers</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QListWidget" name="layer_list_widget"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tools">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>264</width>
+          <height>413</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Tools</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_2"/>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <action name="action_file">
    <property name="text">
