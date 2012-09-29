@@ -1,4 +1,7 @@
 from PySide.QtGui import QMainWindow, QPushButton, QApplication
+from PySide import QtOpenGL
+from OpenGL import GL
+
 from .reticulate_main import Ui_MainWindow
 
 

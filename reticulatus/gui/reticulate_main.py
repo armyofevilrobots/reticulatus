@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'reticulate_main.ui'
 #
-# Created: Thu Sep 27 22:58:00 2012
+# Created: Fri Sep 28 21:41:48 2012
 #      by: pyside-uic 0.2.13 running on PySide 1.1.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,19 +12,47 @@ from PySide import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
+        MainWindow.resize(634, 835)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
+        MainWindow.setMinimumSize(QtCore.QSize(512, 384))
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
+        self.splitter = QtGui.QSplitter(self.centralwidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.splitter.sizePolicy().hasHeightForWidth())
+        self.splitter.setSizePolicy(sizePolicy)
+        self.splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter.setObjectName("splitter")
+        self.object_tabs = QtGui.QTabWidget(self.splitter)
+        self.object_tabs.setObjectName("object_tabs")
+        self.object_3d = QtGui.QWidget()
+        self.object_3d.setObjectName("object_3d")
+        self.object_tabs.addTab(self.object_3d, "")
+        self.gcode = QtGui.QWidget()
+        self.gcode.setObjectName("gcode")
+        self.object_tabs.addTab(self.gcode, "")
+        self.tool_box = QtGui.QToolBox(self.splitter)
+        self.tool_box.setObjectName("tool_box")
+        self.layers = QtGui.QWidget()
+        self.layers.setGeometry(QtCore.QRect(0, 0, 169, 714))
+        self.layers.setObjectName("layers")
+        self.tool_box.addItem(self.layers, "")
+        self.tools = QtGui.QWidget()
+        self.tools.setGeometry(QtCore.QRect(0, 0, 169, 714))
+        self.tools.setObjectName("tools")
+        self.tool_box.addItem(self.tools, "")
+        self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 23))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 634, 23))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -36,6 +64,8 @@ class Ui_MainWindow(object):
         self.menu_Help.setObjectName("menu_Help")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
+        self.statusbar.setEnabled(True)
+        self.statusbar.setSizeGripEnabled(True)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.action_file = QtGui.QAction(MainWindow)
@@ -72,10 +102,16 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu_Help.menuAction())
 
         self.retranslateUi(MainWindow)
+        self.object_tabs.setCurrentIndex(0)
+        self.tool_box.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "MainWindow", None, QtGui.QApplication.UnicodeUTF8))
+        self.object_tabs.setTabText(self.object_tabs.indexOf(self.object_3d), QtGui.QApplication.translate("MainWindow", "3D Object", None, QtGui.QApplication.UnicodeUTF8))
+        self.object_tabs.setTabText(self.object_tabs.indexOf(self.gcode), QtGui.QApplication.translate("MainWindow", "GCode", None, QtGui.QApplication.UnicodeUTF8))
+        self.tool_box.setItemText(self.tool_box.indexOf(self.layers), QtGui.QApplication.translate("MainWindow", "Layers", None, QtGui.QApplication.UnicodeUTF8))
+        self.tool_box.setItemText(self.tool_box.indexOf(self.tools), QtGui.QApplication.translate("MainWindow", "Tools", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "&File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuEdit.setTitle(QtGui.QApplication.translate("MainWindow", "&Edit", None, QtGui.QApplication.UnicodeUTF8))
         self.menu_Settings.setTitle(QtGui.QApplication.translate("MainWindow", "&Settings", None, QtGui.QApplication.UnicodeUTF8))

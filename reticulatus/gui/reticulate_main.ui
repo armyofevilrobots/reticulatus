@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>512</width>
-    <height>384</height>
+    <width>634</width>
+    <height>835</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,14 +26,74 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout"/>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QSplitter" name="splitter">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QTabWidget" name="object_tabs">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="object_3d">
+        <attribute name="title">
+         <string>3D Object</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="gcode">
+        <attribute name="title">
+         <string>GCode</string>
+        </attribute>
+       </widget>
+      </widget>
+      <widget class="QToolBox" name="tool_box">
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <widget class="QWidget" name="layers">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>169</width>
+          <height>714</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Layers</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="tools">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>169</width>
+          <height>714</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Tools</string>
+        </attribute>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>512</width>
+     <width>634</width>
      <height>23</height>
     </rect>
    </property>
@@ -72,7 +132,14 @@
    <addaction name="menu_Settings"/>
    <addaction name="menu_Help"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="sizeGripEnabled">
+    <bool>true</bool>
+   </property>
+  </widget>
   <action name="action_file">
    <property name="text">
     <string>&amp;file</string>
