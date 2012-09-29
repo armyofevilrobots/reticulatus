@@ -33,11 +33,16 @@ Currently working:
  - STL parsing (thanks https://github.com/sconklin!)
  - Conversion of STL to CGAL polymesh
  - CGAL polymesh to layered planar perimeters
-
-Coming soon:
  - Planar perimeter inset based on tool width
  - Multiple perimeters
+
+Coming soon:
  - Cross hatched infill
+ - Full 3d LIVE PREVIEW of printable objects and layers
+ - Realtime slicing
+ - Full multiprocessor support (via multiprocessing) for both
+   slicing and perimeters/infills.
+ - Selective density perimeters
 
 Longer term:
  - Shallow dome perimeter gap filling

@@ -24,6 +24,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def setupUi(self, main_window):
         super(MainWindow, self).setupUi(main_window)
+        print self.object_3d.parentWidget().parentWidget()
+        assert self.object_3d_hlayout == self.object_3d.parentWidget()
         self.object_3d_hlayout.removeWidget(self.object_3d)
         del self.object_3d
         self.object_3d = GLWidget()
