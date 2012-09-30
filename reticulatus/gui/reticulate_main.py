@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'reticulate_main.ui'
 #
-# Created: Sat Sep 29 09:36:32 2012
+# Created: Sat Sep 29 22:33:05 2012
 #      by: pyside-uic 0.2.13 running on PySide 1.1.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -19,9 +19,6 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setMinimumSize(QtCore.QSize(512, 384))
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../../albino_reticulated_python.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QtGui.QHBoxLayout(self.centralwidget)
@@ -35,11 +32,11 @@ class Ui_MainWindow(object):
         self.object_tabs.setObjectName("object_tabs")
         self.object_3d = QtGui.QWidget()
         self.object_3d.setObjectName("object_3d")
-        self.object_3d_hlayout = QtGui.QHBoxLayout(self.object_3d)
-        self.object_3d_hlayout.setObjectName("object_3d_hlayout")
+        self.object_3d_layout = QtGui.QGridLayout(self.object_3d)
+        self.object_3d_layout.setObjectName("object_3d_layout")
         self.gl_widget = QtGui.QWidget(self.object_3d)
         self.gl_widget.setObjectName("gl_widget")
-        self.object_3d_hlayout.addWidget(self.gl_widget)
+        self.object_3d_layout.addWidget(self.gl_widget, 0, 0, 1, 1)
         self.object_tabs.addTab(self.object_3d, "")
         self.gcode = QtGui.QWidget()
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
@@ -67,8 +64,6 @@ class Ui_MainWindow(object):
         self.menu_Settings.setObjectName("menu_Settings")
         self.menu_Help = QtGui.QMenu(self.menubar)
         self.menu_Help.setObjectName("menu_Help")
-        self.menu_View = QtGui.QMenu(self.menubar)
-        self.menu_View.setObjectName("menu_View")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setEnabled(True)
@@ -121,8 +116,6 @@ class Ui_MainWindow(object):
         self.action_Help.setObjectName("action_Help")
         self.action_About = QtGui.QAction(MainWindow)
         self.action_About.setObjectName("action_About")
-        self.action_toolbox = QtGui.QAction(MainWindow)
-        self.action_toolbox.setObjectName("action_toolbox")
         self.menuFile.addAction(self.action_New)
         self.menuFile.addAction(self.action_Open)
         self.menuFile.addAction(self.action_Save)
@@ -133,15 +126,13 @@ class Ui_MainWindow(object):
         self.menu_Help.addAction(self.action_Help)
         self.menu_Help.addSeparator()
         self.menu_Help.addAction(self.action_About)
-        self.menu_View.addAction(self.action_toolbox)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuEdit.menuAction())
-        self.menubar.addAction(self.menu_View.menuAction())
         self.menubar.addAction(self.menu_Settings.menuAction())
         self.menubar.addAction(self.menu_Help.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.object_tabs.setCurrentIndex(1)
+        self.object_tabs.setCurrentIndex(0)
         self.tool_box.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -153,7 +144,6 @@ class Ui_MainWindow(object):
         self.menuEdit.setTitle(QtGui.QApplication.translate("MainWindow", "&Edit", None, QtGui.QApplication.UnicodeUTF8))
         self.menu_Settings.setTitle(QtGui.QApplication.translate("MainWindow", "&Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.menu_Help.setTitle(QtGui.QApplication.translate("MainWindow", "&Help", None, QtGui.QApplication.UnicodeUTF8))
-        self.menu_View.setTitle(QtGui.QApplication.translate("MainWindow", "&View", None, QtGui.QApplication.UnicodeUTF8))
         self.tool_box.setItemText(self.tool_box.indexOf(self.layers), QtGui.QApplication.translate("MainWindow", "Layers", None, QtGui.QApplication.UnicodeUTF8))
         self.tool_box.setItemText(self.tool_box.indexOf(self.tools), QtGui.QApplication.translate("MainWindow", "Tools", None, QtGui.QApplication.UnicodeUTF8))
         self.action_file.setText(QtGui.QApplication.translate("MainWindow", "&file", None, QtGui.QApplication.UnicodeUTF8))
@@ -165,5 +155,4 @@ class Ui_MainWindow(object):
         self.actionS_licing.setText(QtGui.QApplication.translate("MainWindow", "S&licing", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Help.setText(QtGui.QApplication.translate("MainWindow", "&Help", None, QtGui.QApplication.UnicodeUTF8))
         self.action_About.setText(QtGui.QApplication.translate("MainWindow", "&About", None, QtGui.QApplication.UnicodeUTF8))
-        self.action_toolbox.setText(QtGui.QApplication.translate("MainWindow", "&Toolbox", None, QtGui.QApplication.UnicodeUTF8))
 
