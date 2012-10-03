@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>main_window</class>
+ <widget class="QMainWindow" name="main_window">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>636</width>
-    <height>560</height>
+    <width>512</width>
+    <height>384</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -42,11 +42,7 @@
        <attribute name="title">
         <string>3D Object</string>
        </attribute>
-       <layout class="QGridLayout" name="object_3d_layout">
-        <item row="0" column="0">
-         <widget class="QWidget" name="gl_widget" native="true"/>
-        </item>
-       </layout>
+       <layout class="QGridLayout" name="object_3d_layout"/>
       </widget>
       <widget class="QWidget" name="gcode">
        <property name="sizePolicy">
@@ -73,7 +69,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>636</width>
+     <width>512</width>
      <height>23</height>
     </rect>
    </property>
@@ -81,13 +77,13 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="action_New"/>
-    <addaction name="action_Open"/>
-    <addaction name="action_Save"/>
+    <addaction name="action_new"/>
+    <addaction name="action_open"/>
+    <addaction name="action_save"/>
     <addaction name="separator"/>
-    <addaction name="action_Quit"/>
+    <addaction name="action_quit"/>
    </widget>
-   <widget class="QMenu" name="menuEdit">
+   <widget class="QMenu" name="menu_edit">
     <property name="title">
      <string>&amp;Edit</string>
     </property>
@@ -96,19 +92,19 @@
     <property name="title">
      <string>&amp;Settings</string>
     </property>
-    <addaction name="action_Printer"/>
-    <addaction name="actionS_licing"/>
+    <addaction name="action_print"/>
+    <addaction name="action_slice"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="action_Help"/>
+    <addaction name="action_help"/>
     <addaction name="separator"/>
-    <addaction name="action_About"/>
+    <addaction name="action_about"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
+   <addaction name="menu_edit"/>
    <addaction name="menu_Settings"/>
    <addaction name="menu_Help"/>
   </widget>
@@ -120,11 +116,11 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QDockWidget" name="dock_widget">
+  <widget class="QDockWidget" name="layers_dock">
    <property name="minimumSize">
     <size>
-     <width>150</width>
-     <height>300</height>
+     <width>120</width>
+     <height>160</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -137,90 +133,73 @@
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dock_contents">
-    <layout class="QHBoxLayout" name="dock_hlayout">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QToolBox" name="tool_box">
-       <property name="currentIndex">
-        <number>0</number>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Layers</string>
        </property>
-       <widget class="QWidget" name="layers">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>264</width>
-          <height>413</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Layers</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QListWidget" name="layer_list_widget"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tools">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>264</width>
-          <height>413</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Tools</string>
-        </attribute>
-        <layout class="QGridLayout" name="gridLayout_2"/>
-       </widget>
       </widget>
+     </item>
+     <item>
+      <widget class="QListWidget" name="layer_list_widget"/>
      </item>
     </layout>
    </widget>
+  </widget>
+  <widget class="QDockWidget" name="tools_dock">
+   <property name="minimumSize">
+    <size>
+     <width>120</width>
+     <height>160</height>
+    </size>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents"/>
   </widget>
   <action name="action_file">
    <property name="text">
     <string>&amp;file</string>
    </property>
   </action>
-  <action name="action_New">
+  <action name="action_new">
    <property name="text">
     <string>&amp;New</string>
    </property>
   </action>
-  <action name="action_Open">
+  <action name="action_open">
    <property name="text">
     <string>&amp;Open</string>
    </property>
   </action>
-  <action name="action_Save">
+  <action name="action_save">
    <property name="text">
     <string>&amp;Save</string>
    </property>
   </action>
-  <action name="action_Quit">
+  <action name="action_quit">
    <property name="text">
     <string>&amp;Quit</string>
    </property>
   </action>
-  <action name="action_Printer">
+  <action name="action_print">
    <property name="text">
     <string>&amp;Printer</string>
    </property>
   </action>
-  <action name="actionS_licing">
+  <action name="action_slice">
    <property name="text">
     <string>S&amp;licing</string>
    </property>
   </action>
-  <action name="action_Help">
+  <action name="action_help">
    <property name="text">
     <string>&amp;Help</string>
    </property>
   </action>
-  <action name="action_About">
+  <action name="action_about">
    <property name="text">
     <string>&amp;About</string>
    </property>
