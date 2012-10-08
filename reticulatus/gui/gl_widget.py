@@ -134,7 +134,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
         #GLU.gluPerspective(45.0, float(width)/float(height), 0.1, 100.0)
-        GL.glOrtho((-100.0*width)/height, (+100.0*width)/height, 100, -100, 100.0, -300.0)
+        GL.glOrtho((-100.0*width)/height, (+100.0*width)/height, 100, -100, 1500.0, -1500.0)
         GL.glMatrixMode(GL.GL_MODELVIEW)
 
     def mousePressEvent(self, event):
@@ -142,9 +142,11 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.last_pos = QtCore.QPoint(event.pos())
 
     def wheelEvent(self, event):
-        num_degrees = event.delta() / 8
+        num_degrees = event.delta() / 8.0
         num_steps = num_degrees
         self.zoom += num_steps
+        if self.zoom < 100.0:
+            self.zoom = 100.0
         self.updateGL()
 
 

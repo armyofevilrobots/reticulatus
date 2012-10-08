@@ -34,13 +34,16 @@ class MainWindow(QMainWindow, Ui_main_window):
         """Load the stl"""
         fname, _ = QFileDialog.getOpenFileName(
                 self, 'Open file',
-                self.basedir)
+                self.basedir,
+                "STL Files (*.stl);;All Files (*)")
 
         stl = STL(fname)
         #stl.debug=True
         stl.read()
         self.log.info("Loaded %s", stl)
-        self.gl_widget.set_object(stl)
+        if fname:
+            self.gl_widget.set_object(stl)
+            self.basedir = os.path.dirname(fname)
 
 
 
