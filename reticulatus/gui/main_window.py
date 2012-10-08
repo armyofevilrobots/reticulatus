@@ -37,6 +37,7 @@ class MainWindow(QMainWindow, Ui_main_window):
                 self.basedir)
 
         stl = STL(fname)
+        #stl.debug=True
         stl.read()
         self.log.info("Loaded %s", stl)
         self.gl_widget.set_object(stl)

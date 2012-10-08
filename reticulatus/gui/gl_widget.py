@@ -17,10 +17,17 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.log.info("Generating glwidget")
         QtOpenGL.QGLWidget.__init__(self, parent)
 
-        self.object = None
-        self.x_rot = 0
-        self.y_rot = 0
-        self.z_rot = 0
+        self.wireframe = None
+        self.x_rot = 90.0
+        self.y_rot = 0.0
+        self.z_rot = 0.0
+
+        self.x_pan = 0.0
+        self.y_pan = 0.0
+        self.zoom = 100.0
+
+        self.o_width = 0.0
+        self.o_height = 0.0
 
         self.last_pos = QtCore.QPoint()
 
@@ -47,12 +54,15 @@ class GLWidget(QtOpenGL.QGLWidget):
         """Getter"""
         return QtCore.QSize(400, 400)
 
+
+
+
     def set_x_rotation(self, angle):
         """Change our rotation"""
         angle = self.normalizeAngle(angle)
         if angle != self.x_rot:
             self.x_rot = angle
-            self.emit(QtCore.SIGNAL("x_rotationChanged(int)"), angle)
+            #self.emit(QtCore.SIGNAL("x_rotationChanged(int)"), angle)
             self.updateGL()
 
     def set_y_rotation(self, angle):
@@ -60,7 +70,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         angle = self.normalizeAngle(angle)
         if angle != self.y_rot:
             self.y_rot = angle
-            self.emit(QtCore.SIGNAL("y_rotationChanged(int)"), angle)
+            #self.emit(QtCore.SIGNAL("y_rotationChanged(int)"), angle)
             self.updateGL()
 
     def set_z_rotation(self, angle):
@@ -68,7 +78,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         angle = self.normalizeAngle(angle)
         if angle != self.z_rot:
             self.z_rot = angle
-            self.emit(QtCore.SIGNAL("z_rotationChanged(int)"), angle)
+            #self.emit(QtCore.SIGNAL("z_rotationChanged(int)"), angle)
             self.updateGL()
 
     def initializeGL(self):
@@ -76,35 +86,49 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.qglClearColor(self.troll_tech_purple.darker())
         GL.glShadeModel(GL.GL_FLAT)
         GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glEnable(GL.GL_AUTO_NORMAL)
         GL.glEnable(GL.GL_CULL_FACE)
-        GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE );
+        #GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE );
+        GL.glPolygonMode( GL.GL_FRONT, GL.GL_LINE );
 
     def paintGL(self):
         """Redraw"""
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         GL.glLoadIdentity()
-        GL.glTranslated(0.0, 0.0, -10.0)
-        GL.glRotated(self.x_rot / 16.0, 1.0, 0.0, 0.0)
-        GL.glRotated(self.y_rot / 16.0, 0.0, 1.0, 0.0)
-        GL.glRotated(self.z_rot / 16.0, 0.0, 0.0, 1.0)
-        if self.object is not None:
-            GL.glCallList(self.object)
+        GL.glScaled(self.zoom/100, self.zoom/100, self.zoom/100)
+        GL.glTranslated(self.x_pan, self.y_pan, 0)
+        GL.glRotated(self.x_rot , 1.0, 0.0, 0.0)
+        GL.glRotated(self.y_rot , 0.0, 1.0, 0.0)
+        GL.glRotated(self.z_rot , 0.0, 0.0, 1.0)
+        if self.wireframe is not None:
+            GL.glCallList(self.wireframe)
 
     def resizeGL(self, width, height):
         """New window size."""
+        self.o_width = width
+        self.o_height = height
         self.log.debug("Resized gl win to %d, %d", width, height)
         side = min(width, height)
-        GL.glViewport((width - side) / 2, (height - side) / 2, side, side)
+        GL.glViewport(0, 0, width, height)
+        self.log.debug("Setting glviewport: %f, %f, %f, %f", (width - side) / 2, (height - side) / 2, side, side)
+        #GL.glViewport(width,height, width, height)
 
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-        #GL.glOrtho(-0.5, +0.5, +0.5, -0.5, 4.0, 15.0)
-        GL.glOrtho(-20, +20, +20, -20, -80.0, 80.0)
+
+        GL.glOrtho((-100.0*width)/height, (+100.0*width)/height, 100, -100, -1000.0, 1000.0)
         GL.glMatrixMode(GL.GL_MODELVIEW)
 
     def mousePressEvent(self, event):
         """Push"""
         self.last_pos = QtCore.QPoint(event.pos())
+
+    def wheelEvent(self, event):
+        num_degrees = event.delta() / 8
+        num_steps = num_degrees
+        self.zoom += num_steps
+        self.updateGL()
+
 
     def mouseMoveEvent(self, event):
         """Drag, rotate."""
@@ -112,22 +136,23 @@ class GLWidget(QtOpenGL.QGLWidget):
         dy = event.y() - self.last_pos.y()
 
         if event.buttons() & QtCore.Qt.LeftButton:
-            self.set_x_rotation(self.x_rot - 8 * dy)
-            self.set_y_rotation(self.y_rot + 8 * dx)
-            self.log.info("Rotated to xy: : %3.2f,%3.2f", self.x_rot - 8 * dy, self.y_rot + 8 * dx)
+            self.x_pan += 50*dx/self.zoom
+            self.y_pan += 50*dy/self.zoom
+            self.log.info("Panned to %3.3f, %3.3f", self.x_pan, self.y_pan)
+            self.updateGL()
         elif event.buttons() & QtCore.Qt.RightButton:
-            #TODO: Pan instead of rotate
-            self.set_x_rotation(self.x_rot - 8 * dy)
-            self.set_z_rotation(self.z_rot + 8 * dx)
+            self.set_x_rotation(self.x_rot - 0.5 * dy)
+            self.set_z_rotation(self.z_rot + 0.5 * dx)
+            self.log.info("Now rotated to: %3.3d, %3.3d", self.x_rot, self.z_rot)
         self.last_pos = QtCore.QPoint(event.pos())
 
 
     def set_object(self, stl):
         """Set the object from an stl"""
-        self.object = self.load_object(stl)
-        assert object is not None
+        self.wireframe = self.load_object(stl)
+        assert self.wireframe is not None
         self.initializeGL()
-        self.log.info("Set GL object to (dump) %s", self.object)
+        self.log.info("Set GL object to (dump) %s", self.wireframe)
 
 
     def load_object(self, stl):
