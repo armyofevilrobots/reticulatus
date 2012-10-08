@@ -3,6 +3,8 @@ from PySide import QtOpenGL, QtCore, QtGui
 import math
 import logging
 from OpenGL import GL
+from OpenGL import GLUT
+from OpenGL import GLU
 from OpenGL.GL import shaders
 
 
@@ -28,11 +30,15 @@ class GLWidget(QtOpenGL.QGLWidget):
 
         self.o_width = 0.0
         self.o_height = 0.0
+        self.layers = ['wireframe', 'polys']
 
         self.last_pos = QtCore.QPoint()
+        self.wireframe = None
+        self.polygons = None
 
-        self.troll_tech_green = QtGui.QColor.fromCmykF(0.40, 0.0, 1.0, 0.0)
-        self.troll_tech_purple = QtGui.QColor.fromCmykF(0.39, 0.39, 0.0, 0.0)
+        self.poly_line_color = QtGui.QColor.fromCmykF(0.40, 0.0, 1.0, 0.3)
+        self.poly_fill_color =  QtGui.QColor.fromCmykF(0.40, 0.8, 1.0, 0.0)
+        self.gl_bg_color = QtGui.QColor.fromCmykF(0.19, 0.19, 0.0, 0.0)
 
     def x_rotation(self):
         """Getter"""
@@ -83,25 +89,37 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def initializeGL(self):
         """Init"""
-        self.qglClearColor(self.troll_tech_purple.darker())
+        self.qglClearColor(self.gl_bg_color.darker())
         GL.glShadeModel(GL.GL_FLAT)
         GL.glEnable(GL.GL_DEPTH_TEST)
-        GL.glEnable(GL.GL_AUTO_NORMAL)
+        #GL.glEnable(GL.GL_AUTO_NORMAL)
+        GL.glClearDepth(1.0)
+
         GL.glEnable(GL.GL_CULL_FACE)
         #GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE );
-        GL.glPolygonMode( GL.GL_FRONT, GL.GL_LINE );
+        #GL.glPolygonMode( GL.GL_FRONT, GL.GL_LINE );
 
     def paintGL(self):
         """Redraw"""
+        GL.glDepthFunc(GL.GL_LEQUAL);
+        GL.glDepthMask(GL.GL_TRUE);
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         GL.glLoadIdentity()
         GL.glScaled(self.zoom/100, self.zoom/100, self.zoom/100)
-        GL.glTranslated(self.x_pan, self.y_pan, 0)
+        GL.glTranslated(self.x_pan, self.y_pan, 0.1)
         GL.glRotated(self.x_rot , 1.0, 0.0, 0.0)
         GL.glRotated(self.y_rot , 0.0, 1.0, 0.0)
         GL.glRotated(self.z_rot , 0.0, 0.0, 1.0)
-        if self.wireframe is not None:
-            GL.glCallList(self.wireframe)
+        if 'polys' in self.layers:
+            GL.glPolygonOffset(1, 1);
+            GL.glEnable(GL.GL_POLYGON_OFFSET_FILL);
+            if self.polygons is not None:
+                GL.glPolygonMode( GL.GL_FRONT, GL.GL_FILL );
+                GL.glCallList(self.polygons)
+        if 'wireframe' in self.layers:
+            if self.wireframe is not None:
+                GL.glPolygonMode( GL.GL_FRONT, GL.GL_LINE );
+                GL.glCallList(self.wireframe)
 
     def resizeGL(self, width, height):
         """New window size."""
@@ -115,8 +133,8 @@ class GLWidget(QtOpenGL.QGLWidget):
 
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-
-        GL.glOrtho((-100.0*width)/height, (+100.0*width)/height, 100, -100, -1000.0, 1000.0)
+        #GLU.gluPerspective(45.0, float(width)/float(height), 0.1, 100.0)
+        GL.glOrtho((-100.0*width)/height, (+100.0*width)/height, 100, -100, 100.0, -300.0)
         GL.glMatrixMode(GL.GL_MODELVIEW)
 
     def mousePressEvent(self, event):
@@ -149,22 +167,24 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def set_object(self, stl):
         """Set the object from an stl"""
-        self.wireframe = self.load_object(stl)
+        self.wireframe = self.load_object(stl, self.poly_line_color)
+        self.polygons = self.load_object(stl, self.poly_fill_color)
         assert self.wireframe is not None
         self.initializeGL()
         self.log.info("Set GL object to (dump) %s", self.wireframe)
 
 
-    def load_object(self, stl):
+    def load_object(self, stl, color):
         """Loads the object from an stl."""
         genList = GL.glGenLists(1)
         GL.glNewList(genList, GL.GL_COMPILE)
 
         GL.glBegin(GL.GL_TRIANGLES)
 
-        self.qglColor(self.troll_tech_green)
+        self.qglColor(color)
         self.log.info("This STL has %d facets", len(stl.facets))
         for facet in stl.facets:
+            GL.glNormal3d(*facet['n'])
             for point in facet['p']:
                 #self.log.debug('Adding point %s', point)
                 GL.glVertex3d(*point)
@@ -177,7 +197,7 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def extrude(self, x1, y1, x2, y2):
         """Extrude a wall"""
-        self.qglColor(self.troll_tech_green.darker(250 + int(100 * x1)))
+        self.qglColor(self.poly_line_color.darker(250 + int(100 * x1)))
 
         GL.glVertex3d(x1, y1, +0.05)
         GL.glVertex3d(x2, y2, +0.05)
