@@ -17,6 +17,15 @@ class TestSTL(unittest.TestCase):
         stl.read()
         stl.dump()
 
+    def test_20mm_cube_bin(self):
+        """Load a small model?"""
+        stl = STL(os.path.join(os.path.dirname(__file__),
+            'data', '20mmbox.stl'))
+        stl.debug = True
+        type = stl.type()
+        self.assertEquals(type, 'binary')
+        stl.read()
+        stl.dump()
 
     def test_my_head(self):
         """Does it load a huge model OK?"""

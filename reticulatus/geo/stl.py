@@ -211,6 +211,7 @@ class STL():
         """What type of file is this?"""
         binflag = False
         pos = self._readFD.tell()
+        if self.debug: print "My post at start is ",pos
 
         # Try to determine whether this is in binary or ascii format
         self._readFD.seek(0)
@@ -239,6 +240,7 @@ class STL():
             self._length = struct.unpack("<I", tlen)[0]
 
         self._readFD.seek(pos)
+        if self.debug: print "Now at", self._readFD.tell()
         return
 
     ## header
@@ -252,6 +254,7 @@ class STL():
             self.__determine_input_type()
 
         if self._isBinary:
+            if self.debug: print "Header is ",len(self._header), "bytes"
             return self._header
         else:
             return None
@@ -305,9 +308,10 @@ class STL():
         elif self._isBinary:
             self._facets = []
             # Read all the binary vertices
-            self._readFD.seek(80)
+            self._readFD.seek(80+4) #We need to skip header, AND the size uint32
             for i in range(self._length):
                 facet = {}
+
                 (n, p1, p2, p3, b) =  self.__binary_read_triangle()
                 facet['n'] = n
                 facet['p'] = [p1, p2, p3]
