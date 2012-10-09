@@ -35,7 +35,7 @@ Currently working:
  - CGAL polymesh to layered planar perimeters
  - Planar perimeter inset based on tool width
  - Multiple perimeters
- - GUI interface: http://youtu.be/mE1XwmJm848?hd=1
+ - GUI interface: http://youtu.be/4cn2QE-PHxA?hd=1
 
 Coming soon:
  - Cross hatched infill
