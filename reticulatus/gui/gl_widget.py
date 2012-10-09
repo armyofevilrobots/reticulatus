@@ -19,7 +19,11 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.log.info("Generating glwidget")
         QtOpenGL.QGLWidget.__init__(self, parent)
 
-        self.wireframe = None
+        self.poly_line_color = QtGui.QColor.fromCmykF(0.40, 0.0, 1.0, 0.3)
+        self.poly_fill_color =  QtGui.QColor.fromCmykF(0.40, 0.8, 1.0, 0.0)
+        self.gl_bg_color = QtGui.QColor.fromCmykF(0.19, 0.19, 0.0, 0.0)
+        self.gl_platform_color = QtGui.QColor.fromRgbF(0.5, 0.5, 0.5, 0.5)
+
         self.x_rot = 90.0
         self.y_rot = 0.0
         self.z_rot = 0.0
@@ -30,15 +34,11 @@ class GLWidget(QtOpenGL.QGLWidget):
 
         self.o_width = 0.0
         self.o_height = 0.0
-        self.layers = ['wireframe', 'polys']
+        self.layers = ['wireframe', 'polygons', 'platform']
+        self.objects = dict(wireframe=None, polygons=None, platform=None)
 
         self.last_pos = QtCore.QPoint()
-        self.wireframe = None
-        self.polygons = None
 
-        self.poly_line_color = QtGui.QColor.fromCmykF(0.40, 0.0, 1.0, 0.3)
-        self.poly_fill_color =  QtGui.QColor.fromCmykF(0.40, 0.8, 1.0, 0.0)
-        self.gl_bg_color = QtGui.QColor.fromCmykF(0.19, 0.19, 0.0, 0.0)
 
     def x_rotation(self):
         """Getter"""
@@ -95,13 +95,13 @@ class GLWidget(QtOpenGL.QGLWidget):
         #GL.glEnable(GL.GL_AUTO_NORMAL)
         GL.glClearDepth(1.0)
 
-        GL.glEnable(GL.GL_CULL_FACE)
+        #GL.glEnable(GL.GL_CULL_FACE)
         #GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE );
         #GL.glPolygonMode( GL.GL_FRONT, GL.GL_LINE );
 
     def paintGL(self):
         """Redraw"""
-        GL.glDepthFunc(GL.GL_LEQUAL);
+        GL.glDepthFunc(GL.GL_LEQUAL)
         GL.glDepthMask(GL.GL_TRUE);
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         GL.glLoadIdentity()
@@ -110,16 +110,17 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glRotated(self.x_rot , 1.0, 0.0, 0.0)
         GL.glRotated(self.y_rot , 0.0, 1.0, 0.0)
         GL.glRotated(self.z_rot , 0.0, 0.0, 1.0)
-        if 'polys' in self.layers:
-            GL.glPolygonOffset(1, 1);
-            GL.glEnable(GL.GL_POLYGON_OFFSET_FILL);
-            if self.polygons is not None:
-                GL.glPolygonMode( GL.GL_FRONT, GL.GL_FILL );
-                GL.glCallList(self.polygons)
-        if 'wireframe' in self.layers:
-            if self.wireframe is not None:
-                GL.glPolygonMode( GL.GL_FRONT, GL.GL_LINE );
-                GL.glCallList(self.wireframe)
+        for layer in self.layers:
+            if layer == 'wireframe':
+                GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE )
+            else:
+                GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_FILL )
+                if layer != 'platform':
+                    GL.glPolygonOffset(1, 1)
+            self.log.info("Painting: %s" % layer)
+            if self.objects[layer] is not None:
+                GL.glCallList(self.objects[layer])
+
 
     def resizeGL(self, width, height):
         """New window size."""
@@ -166,17 +167,47 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def set_object(self, stl):
         """Set the object from an stl"""
-        self.wireframe = self.load_object(stl, self.poly_line_color)
-        self.polygons = self.load_object(stl, self.poly_fill_color)
-        assert self.wireframe is not None
+        self.objects['wireframe'] = self.load_object(stl, self.poly_line_color)
+        self.objects['polygons'] = self.load_object(stl, self.poly_fill_color)
+        self.objects['platform'] = self._build_plane(self.gl_platform_color)
         self.initializeGL()
-        self.log.info("Set GL object to (dump) %s", self.wireframe)
+
+
+    def _build_plane(self, color):
+        plane_genlist = GL.glGenLists(1)
+        GL.glNewList(plane_genlist, GL.GL_COMPILE)
+        GL.glBegin(GL.GL_TRIANGLES)
+
+        self.qglColor(color)
+        GL.glNormal3d(0.0, 0.0, 1.0)
+        GL.glVertex3d(-100.0, 100, 0.0)
+        GL.glVertex3d(100.0, 100, 0.0)
+        GL.glVertex3d(100.0, -100.0, 0.0)
+
+        GL.glNormal3d(0.0, 0.0, 1.0)
+        GL.glVertex3d(-100.0, 100, 0.0)
+        GL.glVertex3d(100.0, -100, 0.0)
+        GL.glVertex3d(-100.0, -100.0, 0.0)
+
+        GL.glNormal3d(0.0, 0.0, -1.0)
+        GL.glVertex3d(-101.0, 100, 0.0001)
+        GL.glVertex3d(101.0, 100, 0.0001)
+        GL.glVertex3d(101.0, -101.0, 0.0001)
+
+        GL.glNormal3d(0.0, 0.0, -1.0)
+        GL.glVertex3d(-101.0, 100, 0.0001)
+        GL.glVertex3d(101.0, -100, 0.0001)
+        GL.glVertex3d(-101.0, -101.0, 0.0001)
+
+        GL.glEnd()
+        GL.glEndList()
+        return plane_genlist
 
 
     def load_object(self, stl, color):
         """Loads the object from an stl."""
-        genList = GL.glGenLists(1)
-        GL.glNewList(genList, GL.GL_COMPILE)
+        obj_genlist = GL.glGenLists(1)
+        GL.glNewList(obj_genlist, GL.GL_COMPILE)
 
         GL.glBegin(GL.GL_TRIANGLES)
 
@@ -191,7 +222,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glEnd()
         GL.glEndList()
 
-        return genList
+        return obj_genlist
 
 
     def extrude(self, x1, y1, x2, y2):

@@ -2,6 +2,7 @@
 from PySide.QtGui import QMainWindow, QFileDialog
 import logging
 import os.path
+import time
 
 from .reticulate_main import Ui_main_window
 from .gl_widget import GLWidget
@@ -46,6 +47,7 @@ class MainWindow(QMainWindow, Ui_main_window):
 
     def load_stl_file(self):
         """Load the stl"""
+        now = time.time()
         fname, _ = QFileDialog.getOpenFileName(
                 self, 'Open file',
                 self.basedir,
@@ -58,11 +60,18 @@ class MainWindow(QMainWindow, Ui_main_window):
         #stl.debug=True
         stl.read(self._loader_cb)
         self.log.info("Loaded %s", stl)
+        self.statusBar().showMessage("Processing...")
         if fname:
             self.gl_widget.set_object(stl)
             self.basedir = os.path.dirname(fname)
         self.statusBar().showMessage(
-                "Loaded model %s" % os.path.basename(fname))
+                "Loaded model %s with %d polygons in %0.1f seconds" %
+                (
+                    os.path.basename(fname),
+                    len(stl.facets),
+                    time.time()-now
+                    )
+                )
 
 
 
