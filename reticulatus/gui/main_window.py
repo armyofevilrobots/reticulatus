@@ -47,7 +47,6 @@ class MainWindow(QMainWindow, Ui_main_window):
 
     def load_stl_file(self):
         """Load the stl"""
-        now = time.time()
         fname, _ = QFileDialog.getOpenFileName(
                 self, 'Open file',
                 self.basedir,
@@ -58,6 +57,7 @@ class MainWindow(QMainWindow, Ui_main_window):
             return
         stl = STL(fname)
         #stl.debug=True
+        now = time.time()
         stl.read(self._loader_cb)
         self.log.info("Loaded %s", stl)
         self.statusBar().showMessage("Processing...")
