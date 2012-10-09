@@ -293,7 +293,7 @@ class STL():
 
     ## read
     #
-    def read(self):
+    def read(self, callback=None):
         """
         Reads the input file into an internal representation.
         Raises an exception on error
@@ -310,6 +310,8 @@ class STL():
             # Read all the binary vertices
             self._readFD.seek(80+4) #We need to skip header, AND the size uint32
             for i in range(self._length):
+                if callback is not None and i % 1000 == 0:
+                    callback(self._length, i)
                 facet = {}
 
                 (n, p1, p2, p3, b) =  self.__binary_read_triangle()
@@ -328,6 +330,8 @@ class STL():
                         line)
             try:
                 while True:
+                    if callback is not None and len(self._facets) % 1000 == 0:
+                        callback(None, len(self._facets))
                     facet = dict()
                     (n, p1, p2, p3, b) =  self.__ascii_read_triangle()
                     facet['n'] = n

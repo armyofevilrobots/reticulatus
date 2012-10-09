@@ -129,11 +129,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         side = min(width, height)
         GL.glViewport(0, 0, width, height)
         self.log.debug("Setting glviewport: %f, %f, %f, %f", (width - side) / 2, (height - side) / 2, side, side)
-        #GL.glViewport(width,height, width, height)
-
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-        #GLU.gluPerspective(45.0, float(width)/float(height), 0.1, 100.0)
         GL.glOrtho((-100.0*width)/height, (+100.0*width)/height, 100, -100, 1500.0, -1500.0)
         GL.glMatrixMode(GL.GL_MODELVIEW)
 

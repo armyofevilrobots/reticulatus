@@ -20,7 +20,9 @@ class MainWindow(QMainWindow, Ui_main_window):
         self.setupUi(self)
         self.basedir = os.getcwd()
 
+
     def setupUi(self, main_window):
+        """Set's up the UI, connects actions."""
         super(MainWindow, self).setupUi(main_window)
         self.gl_widget = GLWidget()
         self.gl_widget.setObjectName("gl_widget")
@@ -30,6 +32,18 @@ class MainWindow(QMainWindow, Ui_main_window):
         self.action_open.setStatusTip('Open new File')
         self.action_open.triggered.connect(self.load_stl_file)
 
+    def _loader_cb(self, total, loaded):
+        """Show us the progress of the file loading."""
+        if total is not None:
+            assert total >= loaded
+            self.log.debug("total, loaded %s %s", total, loaded)
+            self.log.debug("total, loaded %s %s", type(total), type(loaded))
+            self.statusBar().showMessage(
+                    "Loaded: %02.1f%%" % ((100.0*loaded)/total))
+        else:
+            self.statusBar().showMessage("Loaded polys: %8d" % loaded)
+
+
     def load_stl_file(self):
         """Load the stl"""
         fname, _ = QFileDialog.getOpenFileName(
@@ -37,13 +51,18 @@ class MainWindow(QMainWindow, Ui_main_window):
                 self.basedir,
                 "STL Files (*.stl);;All Files (*)")
 
+        if not fname:
+            self.statusBar().showMessage("No file selected.")
+            return
         stl = STL(fname)
         #stl.debug=True
-        stl.read()
+        stl.read(self._loader_cb)
         self.log.info("Loaded %s", stl)
         if fname:
             self.gl_widget.set_object(stl)
             self.basedir = os.path.dirname(fname)
+        self.statusBar().showMessage(
+                "Loaded model %s" % os.path.basename(fname))
 
 
 
