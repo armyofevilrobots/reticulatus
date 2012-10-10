@@ -40,6 +40,13 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.last_pos = QtCore.QPoint()
 
 
+
+    def _cleanup(self):
+        #This part fixes a memory leak
+        for name, genlist in self.objects.iteritems():
+            if genlist is not None:
+                GL.glDeleteLists(genlist, 1)
+
     def x_rotation(self):
         """Getter"""
         return self.x_rot
@@ -92,17 +99,21 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.qglClearColor(self.gl_bg_color.darker())
         GL.glShadeModel(GL.GL_FLAT)
         GL.glEnable(GL.GL_DEPTH_TEST)
-        #GL.glEnable(GL.GL_AUTO_NORMAL)
+
         GL.glClearDepth(1.0)
 
-        #GL.glEnable(GL.GL_CULL_FACE)
-        #GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE );
-        #GL.glPolygonMode( GL.GL_FRONT, GL.GL_LINE );
+        #Fix up the lines to be cleaner...
+        GL.glEnable(GL.GL_LINE_SMOOTH);
+        GL.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
+        GL.glLineWidth(2)
+        GL.glEnable(GL.GL_BLEND);
+        GL.glEnable(GL.GL_MULTISAMPLE)
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
     def paintGL(self):
         """Redraw"""
         GL.glDepthFunc(GL.GL_LEQUAL)
-        GL.glDepthMask(GL.GL_TRUE);
+        GL.glDepthMask(GL.GL_TRUE)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         GL.glLoadIdentity()
         GL.glScaled(self.zoom/100, self.zoom/100, self.zoom/100)
@@ -110,7 +121,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glRotated(self.x_rot , 1.0, 0.0, 0.0)
         GL.glRotated(self.y_rot , 0.0, 1.0, 0.0)
         GL.glRotated(self.z_rot , 0.0, 0.0, 1.0)
-        for layer in self.layers:
+        for layer in sorted(self.layers):
             if layer == 'wireframe':
                 GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE )
             else:
@@ -167,6 +178,7 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def set_object(self, stl):
         """Set the object from an stl"""
+        self._cleanup()
         self.objects['wireframe'] = self.load_object(stl, self.poly_line_color)
         self.objects['polygons'] = self.load_object(stl, self.poly_fill_color)
         self.objects['platform'] = self._build_plane(self.gl_platform_color)
