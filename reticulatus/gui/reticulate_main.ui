@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>512</width>
-    <height>384</height>
+    <width>925</width>
+    <height>666</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -69,7 +69,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>512</width>
+     <width>925</width>
      <height>23</height>
     </rect>
    </property>
@@ -110,11 +110,19 @@
     </property>
     <addaction name="action_Slice"/>
    </widget>
+   <widget class="QMenu" name="menu_Windows">
+    <property name="title">
+     <string>&amp;Windows</string>
+    </property>
+    <addaction name="action_Layers"/>
+    <addaction name="action_Toolbox"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menu_edit"/>
-   <addaction name="menu_Settings"/>
-   <addaction name="menu_Help"/>
    <addaction name="menuActions"/>
+   <addaction name="menu_Settings"/>
+   <addaction name="menu_Windows"/>
+   <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="enabled">
@@ -220,6 +228,16 @@
   <action name="action_Slice">
    <property name="text">
     <string>&amp;Slice</string>
+   </property>
+  </action>
+  <action name="action_Layers">
+   <property name="text">
+    <string>&amp;Layers</string>
+   </property>
+  </action>
+  <action name="action_Toolbox">
+   <property name="text">
+    <string>&amp;Toolbox</string>
    </property>
   </action>
  </widget>

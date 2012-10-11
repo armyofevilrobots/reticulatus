@@ -1,11 +1,11 @@
 """Main UI stuffs"""
 from PySide import QtOpenGL, QtCore, QtGui
-import math
+#import math
 import logging
 from OpenGL import GL
-from OpenGL import GLUT
-from OpenGL import GLU
-from OpenGL.GL import shaders
+#from OpenGL import GLUT
+#from OpenGL import GLU
+#from OpenGL.GL import shaders
 
 
 
@@ -36,14 +36,20 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.o_height = 0.0
         self.layers = ['wireframe', 'polygons', 'platform']
         self.objects = dict(wireframe=None, polygons=None, platform=None)
+        self.colors = dict(
+                wireframe=self.poly_line_color,
+                polygons=self.poly_fill_color,
+                platform=self.gl_platform_color,
+                _background=self.gl_bg_color)
 
         self.last_pos = QtCore.QPoint()
 
 
 
     def _cleanup(self):
+        """Cleans up the genlists to prevent memleaks."""
         #This part fixes a memory leak
-        for name, genlist in self.objects.iteritems():
+        for _, genlist in self.objects.iteritems():
             if genlist is not None:
                 GL.glDeleteLists(genlist, 1)
 
@@ -103,12 +109,12 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glClearDepth(1.0)
 
         #Fix up the lines to be cleaner...
-        GL.glEnable(GL.GL_LINE_SMOOTH);
-        GL.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
+        GL.glEnable(GL.GL_LINE_SMOOTH)
+        GL.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST)
         GL.glLineWidth(2)
-        GL.glEnable(GL.GL_BLEND);
+        GL.glEnable(GL.GL_BLEND)
         GL.glEnable(GL.GL_MULTISAMPLE)
-        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
 
     def paintGL(self):
         """Redraw"""
@@ -140,10 +146,12 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.log.debug("Resized gl win to %d, %d", width, height)
         side = min(width, height)
         GL.glViewport(0, 0, width, height)
-        self.log.debug("Setting glviewport: %f, %f, %f, %f", (width - side) / 2, (height - side) / 2, side, side)
+        self.log.debug("Setting glviewport: %f, %f, %f, %f",
+                (width - side) / 2, (height - side) / 2, side, side)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-        GL.glOrtho((-100.0*width)/height, (+100.0*width)/height, 100, -100, 1500.0, -1500.0)
+        GL.glOrtho((-100.0*width)/height, (+100.0*width)/height,
+                100, -100, 1500.0, -1500.0)
         GL.glMatrixMode(GL.GL_MODELVIEW)
 
     def mousePressEvent(self, event):
@@ -172,8 +180,32 @@ class GLWidget(QtOpenGL.QGLWidget):
         elif event.buttons() & QtCore.Qt.RightButton:
             self.set_x_rotation(self.x_rot - 0.5 * dy)
             self.set_z_rotation(self.z_rot + 0.5 * dx)
-            self.log.info("Now rotated to: %3.3d, %3.3d", self.x_rot, self.z_rot)
+            self.log.info("Now rotated to: %3.3d, %3.3d",
+                    self.x_rot, self.z_rot)
         self.last_pos = QtCore.QPoint(event.pos())
+
+    def toggle_layer(self, item):
+        """We got a doubleclick on a layer, so
+        we toggle it."""
+        layer = item.text()
+        self.log.debug("Toggling layer %s", layer)
+        if layer in self.layers:
+            self.layers.remove(layer)
+        else:
+            self.layers.append(layer)
+        self.updateGL()
+
+    def _sync_listwidget(self):
+        """Sync the list widget in my parent to match my current layers."""
+        parent = self.window()
+        if not parent:
+            return
+        lwidg = parent.layer_list_widget
+        lwidg.clear()
+        for layer in self.layers:
+            lwidg.addItem(
+                    QtGui.QListWidgetItem(layer))
+
 
 
     def set_object(self, stl):
@@ -182,10 +214,12 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.objects['wireframe'] = self.load_object(stl, self.poly_line_color)
         self.objects['polygons'] = self.load_object(stl, self.poly_fill_color)
         self.objects['platform'] = self._build_plane(self.gl_platform_color)
+        self._sync_listwidget()
         self.initializeGL()
 
 
     def _build_plane(self, color):
+        """Build the platform plane."""
         plane_genlist = GL.glGenLists(1)
         GL.glNewList(plane_genlist, GL.GL_COMPILE)
         GL.glBegin(GL.GL_TRIANGLES)
@@ -201,15 +235,15 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glVertex3d(100.0, -100, 0.0)
         GL.glVertex3d(-100.0, -100.0, 0.0)
 
-        GL.glNormal3d(0.0, 0.0, -1.0)
-        GL.glVertex3d(-101.0, 100, 0.0001)
-        GL.glVertex3d(101.0, 100, 0.0001)
-        GL.glVertex3d(101.0, -101.0, 0.0001)
+        #GL.glNormal3d(0.0, 0.0, -1.0)
+        #GL.glVertex3d(-101.0, 100, 0.0001)
+        #GL.glVertex3d(101.0, 100, 0.0001)
+        #GL.glVertex3d(101.0, -101.0, 0.0001)
 
-        GL.glNormal3d(0.0, 0.0, -1.0)
-        GL.glVertex3d(-101.0, 100, 0.0001)
-        GL.glVertex3d(101.0, -100, 0.0001)
-        GL.glVertex3d(-101.0, -101.0, 0.0001)
+        #GL.glNormal3d(0.0, 0.0, -1.0)
+        #GL.glVertex3d(-101.0, 100, 0.0001)
+        #GL.glVertex3d(101.0, -100, 0.0001)
+        #GL.glVertex3d(-101.0, -101.0, 0.0001)
 
         GL.glEnd()
         GL.glEndList()

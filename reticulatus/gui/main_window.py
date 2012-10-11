@@ -1,5 +1,6 @@
 """Main UI stuffs"""
 from PySide.QtGui import QMainWindow, QFileDialog
+from PySide.QtCore import SIGNAL
 import logging
 import os.path
 import time
@@ -25,13 +26,19 @@ class MainWindow(QMainWindow, Ui_main_window):
     def setupUi(self, main_window):
         """Set's up the UI, connects actions."""
         super(MainWindow, self).setupUi(main_window)
-        self.gl_widget = GLWidget()
+        self.gl_widget = GLWidget(self)
         self.gl_widget.setObjectName("gl_widget")
         self.object_3d_layout.addWidget(self.gl_widget, 0, 0, 1, 1)
         self.action_quit.setStatusTip('Exit application')
         self.action_quit.triggered.connect(self.close)
         self.action_open.setStatusTip('Open new File')
         self.action_open.triggered.connect(self.load_stl_file)
+        self.connect(self.layer_list_widget,
+                SIGNAL("itemDoubleClicked(QListWidgetItem *)"),
+                    self.gl_widget.toggle_layer)
+
+
+
 
     def _loader_cb(self, total, loaded):
         """Show us the progress of the file loading."""

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'reticulate_main.ui'
 #
-# Created: Tue Oct  2 20:57:20 2012
+# Created: Wed Oct 10 21:44:11 2012
 #      by: pyside-uic 0.2.13 running on PySide 1.1.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_main_window(object):
     def setupUi(self, main_window):
         main_window.setObjectName("main_window")
-        main_window.resize(512, 384)
+        main_window.resize(925, 666)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -51,7 +51,7 @@ class Ui_main_window(object):
         self.horizontalLayout.addWidget(self.object_tabs)
         main_window.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(main_window)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 512, 23))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 925, 23))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -61,6 +61,10 @@ class Ui_main_window(object):
         self.menu_Settings.setObjectName("menu_Settings")
         self.menu_Help = QtGui.QMenu(self.menubar)
         self.menu_Help.setObjectName("menu_Help")
+        self.menuActions = QtGui.QMenu(self.menubar)
+        self.menuActions.setObjectName("menuActions")
+        self.menu_Windows = QtGui.QMenu(self.menubar)
+        self.menu_Windows.setObjectName("menu_Windows")
         main_window.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(main_window)
         self.statusbar.setEnabled(True)
@@ -108,6 +112,14 @@ class Ui_main_window(object):
         self.action_help.setObjectName("action_help")
         self.action_about = QtGui.QAction(main_window)
         self.action_about.setObjectName("action_about")
+        self.action_Display = QtGui.QAction(main_window)
+        self.action_Display.setObjectName("action_Display")
+        self.action_Slice = QtGui.QAction(main_window)
+        self.action_Slice.setObjectName("action_Slice")
+        self.action_Layers = QtGui.QAction(main_window)
+        self.action_Layers.setObjectName("action_Layers")
+        self.action_Toolbox = QtGui.QAction(main_window)
+        self.action_Toolbox.setObjectName("action_Toolbox")
         self.menuFile.addAction(self.action_new)
         self.menuFile.addAction(self.action_open)
         self.menuFile.addAction(self.action_save)
@@ -115,12 +127,18 @@ class Ui_main_window(object):
         self.menuFile.addAction(self.action_quit)
         self.menu_Settings.addAction(self.action_print)
         self.menu_Settings.addAction(self.action_slice)
+        self.menu_Settings.addAction(self.action_Display)
         self.menu_Help.addAction(self.action_help)
         self.menu_Help.addSeparator()
         self.menu_Help.addAction(self.action_about)
+        self.menuActions.addAction(self.action_Slice)
+        self.menu_Windows.addAction(self.action_Layers)
+        self.menu_Windows.addAction(self.action_Toolbox)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menu_edit.menuAction())
+        self.menubar.addAction(self.menuActions.menuAction())
         self.menubar.addAction(self.menu_Settings.menuAction())
+        self.menubar.addAction(self.menu_Windows.menuAction())
         self.menubar.addAction(self.menu_Help.menuAction())
 
         self.retranslateUi(main_window)
@@ -128,13 +146,15 @@ class Ui_main_window(object):
         QtCore.QMetaObject.connectSlotsByName(main_window)
 
     def retranslateUi(self, main_window):
-        main_window.setWindowTitle(QtGui.QApplication.translate("main_window", "MainWindow", None, QtGui.QApplication.UnicodeUTF8))
+        main_window.setWindowTitle(QtGui.QApplication.translate("main_window", "Reticulatus", None, QtGui.QApplication.UnicodeUTF8))
         self.object_tabs.setTabText(self.object_tabs.indexOf(self.object_3d), QtGui.QApplication.translate("main_window", "3D Object", None, QtGui.QApplication.UnicodeUTF8))
         self.object_tabs.setTabText(self.object_tabs.indexOf(self.gcode), QtGui.QApplication.translate("main_window", "GCode", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("main_window", "&File", None, QtGui.QApplication.UnicodeUTF8))
         self.menu_edit.setTitle(QtGui.QApplication.translate("main_window", "&Edit", None, QtGui.QApplication.UnicodeUTF8))
         self.menu_Settings.setTitle(QtGui.QApplication.translate("main_window", "&Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.menu_Help.setTitle(QtGui.QApplication.translate("main_window", "&Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuActions.setTitle(QtGui.QApplication.translate("main_window", "&Actions", None, QtGui.QApplication.UnicodeUTF8))
+        self.menu_Windows.setTitle(QtGui.QApplication.translate("main_window", "&Windows", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("main_window", "Layers", None, QtGui.QApplication.UnicodeUTF8))
         self.action_file.setText(QtGui.QApplication.translate("main_window", "&file", None, QtGui.QApplication.UnicodeUTF8))
         self.action_new.setText(QtGui.QApplication.translate("main_window", "&New", None, QtGui.QApplication.UnicodeUTF8))
@@ -145,4 +165,8 @@ class Ui_main_window(object):
         self.action_slice.setText(QtGui.QApplication.translate("main_window", "S&licing", None, QtGui.QApplication.UnicodeUTF8))
         self.action_help.setText(QtGui.QApplication.translate("main_window", "&Help", None, QtGui.QApplication.UnicodeUTF8))
         self.action_about.setText(QtGui.QApplication.translate("main_window", "&About", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Display.setText(QtGui.QApplication.translate("main_window", "&Display", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Slice.setText(QtGui.QApplication.translate("main_window", "&Slice", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Layers.setText(QtGui.QApplication.translate("main_window", "&Layers", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Toolbox.setText(QtGui.QApplication.translate("main_window", "&Toolbox", None, QtGui.QApplication.UnicodeUTF8))
 
