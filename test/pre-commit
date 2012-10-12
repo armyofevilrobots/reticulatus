@@ -1,0 +1,20 @@
+#!/bin/bash
+ME=$(readlink -f $0)
+TESTDIR=$(dirname "$ME")
+echo "Running tests against $ME in $TESTDIR"
+source $TESTDIR/../bin/activate
+cd $VIRTUAL_ENV
+ORATING=`pylint --reports=yes reticulatus|grep Your.code.has.been.rated.at|cut -d" " -f 7 | sed "s/\/.*//g"`
+RATING=`echo "($ORATING*100)/1"|bc`
+if [[ "$RATING" -lt "750" ]]; then
+    echo "Your code rated too low with a $ORATING Try fixing it up via pylint."
+    echo "You should be able to get at least a 7.5"
+    exit 1
+else
+    echo "Code looks good at $RATING."
+    echo "Allowing commmit."
+fi
+cd $VIRTUAL_ENV/test
+$VIRTUAL_ENV/bin/nosetests -v $VIRTUAL_ENV/test|| (echo "Failed unit tests." && false)
+exit $?
+

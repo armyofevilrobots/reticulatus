@@ -7,6 +7,7 @@ import time
 
 from .reticulate_main import Ui_main_window
 from .gl_widget import GLWidget
+import icon
 from ..geo.stl import STL
 
 #QT warnings due to pep8 != QT
@@ -20,6 +21,9 @@ class MainWindow(QMainWindow, Ui_main_window):
         self.log = logging.getLogger(__name__)
         self.gl_widget = None #Pylint Complaint
         self.setupUi(self)
+        self.setWindowTitle('Reticulatus')
+        self.setWindowIcon(icon.by_name('spectacle-3d'))
+
         self.basedir = os.getcwd()
 
 
@@ -33,9 +37,12 @@ class MainWindow(QMainWindow, Ui_main_window):
         self.action_quit.triggered.connect(self.close)
         self.action_open.setStatusTip('Open new File')
         self.action_open.triggered.connect(self.load_stl_file)
+        #self.connect(self.layer_list_widget,
+                #SIGNAL("itemClicked(QListWidgetItem *)"),
+                    #self.gl_widget.toggle_layer)
         self.connect(self.layer_list_widget,
-                SIGNAL("itemDoubleClicked(QListWidgetItem *)"),
-                    self.gl_widget.toggle_layer)
+                SIGNAL("itemChanged(QListWidgetItem *)"),
+                    self.gl_widget.sync_layer)
 
 
 

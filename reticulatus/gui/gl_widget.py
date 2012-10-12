@@ -3,6 +3,7 @@ from PySide import QtOpenGL, QtCore, QtGui
 #import math
 import logging
 from OpenGL import GL
+from reticulatus.gui import icon
 #from OpenGL import GLUT
 #from OpenGL import GLU
 #from OpenGL.GL import shaders
@@ -41,6 +42,7 @@ class GLWidget(QtOpenGL.QGLWidget):
                 polygons=self.poly_fill_color,
                 platform=self.gl_platform_color,
                 _background=self.gl_bg_color)
+        self._iconcache = None
 
         self.last_pos = QtCore.QPoint()
 
@@ -190,10 +192,44 @@ class GLWidget(QtOpenGL.QGLWidget):
         layer = item.text()
         self.log.debug("Toggling layer %s", layer)
         if layer in self.layers:
+            item.setCheckState(QtCore.Qt.CheckState.Unchecked)
             self.layers.remove(layer)
         else:
+            item.setCheckState(QtCore.Qt.CheckState.Checked)
             self.layers.append(layer)
         self.updateGL()
+
+
+    def sync_layer(self, item):
+        """We got a change state, so we do something
+        to make sure the checkstate and the layer state
+        match.
+        Note; maybe I should refactor this to only use checkstate"""
+        layer = item.text()
+        if item.checkState() == QtCore.Qt.CheckState.Checked:
+            if not layer in self.layers:
+                self.layers.append(layer)
+        else:
+            if layer in self.layers:
+                self.layers.remove(layer)
+        self.updateGL()
+
+
+    @property
+    def _icons(self):
+        """get/cache icons"""
+        if self._iconcache:
+            return self._iconcache
+        ICO_PAINT = icon.by_name('paint-brush')
+        ICO_LINE = icon.by_name('pencil')
+        ICO_PLANE = icon.by_name('grid')
+        self._iconcache = dict(
+                wireframe=ICO_LINE,
+                polygons=ICO_PAINT,
+                platform=ICO_PLANE,
+                )
+        return self._iconcache
+
 
     def _sync_listwidget(self):
         """Sync the list widget in my parent to match my current layers."""
@@ -202,9 +238,15 @@ class GLWidget(QtOpenGL.QGLWidget):
             return
         lwidg = parent.layer_list_widget
         lwidg.clear()
+
         for layer in self.layers:
+            witem = QtGui.QListWidgetItem(self._icons[layer], layer)
             lwidg.addItem(
-                    QtGui.QListWidgetItem(layer))
+                    witem
+                    )
+            witem.setCheckState(QtCore.Qt.CheckState.Checked)
+            assert witem.icon() is not None
+
 
 
 

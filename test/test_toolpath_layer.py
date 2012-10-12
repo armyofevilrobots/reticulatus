@@ -103,10 +103,10 @@ class TestLayer(unittest.TestCase):
         ctx.set_line_width (0.001)
         ctx.stroke()
 
-        outpath = os.path.join(
-            os.path.dirname(__file__),
-            'out', 'stl-topview.png')
-        surf.write_to_png(outpath)
+        #outpath = os.path.join(
+            #os.path.dirname(__file__),
+            #'out', 'stl-topview.png')
+        #surf.write_to_png(outpath)
 
         model = Model.from_stl(stl)
         #layers = model.generate_planar_intersections(-0, 1, 10)
@@ -115,9 +115,9 @@ class TestLayer(unittest.TestCase):
         print "Simple planar intersections: That took %5.5f seconds" % (time.time()-now)
         p = Pool(cpu_count()*4)
 
-        now = time.time()
-        p.map(generate_cairo_map, layers)
-        print "Generating output hires PNG files took %5.5f seconds" % (time.time()-now)
+        #now = time.time()
+        #p.map(generate_cairo_map, layers)
+        #print "Generating output hires PNG files took %5.5f seconds" % (time.time()-now)
 
 
     def test_01_generate_insets(self):
@@ -154,7 +154,7 @@ class TestLayer(unittest.TestCase):
         layers = [
                 (plane[0], Layer.from_CGAL_intersections(plane[1])) for
                     plane in
-                    model.generate_planar_intersections(0, 0.1, 30)
+                    model.generate_planar_intersections(0, 0.5, 30)
                     if len(plane[1])]
         print "Generating slices for %d layers took %3.3f seconds." % (len(layers), time.time()-now)
 
@@ -169,6 +169,7 @@ class TestLayer(unittest.TestCase):
         print "Insetting perimeters for 3 loops for %d layers took %3.3f seconds." % (len(layers), time.time()-now)
 
 
+        return #We don't need to dump files now.
         now = time.time()
         for layer in layers:
             outpath = os.path.join(
