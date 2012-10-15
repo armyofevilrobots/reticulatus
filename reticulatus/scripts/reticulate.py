@@ -47,7 +47,6 @@ def main():
         app = App(sys.argv)
         wid = MainWindow()
         wid.resize(250, 150)
-        wid.setWindowTitle('Simple')
         wid.show()
         sys.exit(app.exec_())
 

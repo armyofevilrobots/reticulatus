@@ -32,7 +32,8 @@ class MainWindow(QMainWindow, Ui_main_window):
         super(MainWindow, self).setupUi(main_window)
         self.gl_widget = GLWidget(self)
         self.gl_widget.setObjectName("gl_widget")
-        self.object_3d_layout.addWidget(self.gl_widget, 0, 0, 1, 1)
+        self.object_3d_layout.addWidget(self.gl_widget)#, 0, 0, 1, 1)
+        self.gl_widget.set_slice_slider(self.layer_slider)
         self.action_quit.setStatusTip('Exit application')
         self.action_quit.triggered.connect(self.close)
         self.action_open.setStatusTip('Open new File')
@@ -43,9 +44,7 @@ class MainWindow(QMainWindow, Ui_main_window):
         self.connect(self.layer_list_widget,
                 SIGNAL("itemChanged(QListWidgetItem *)"),
                     self.gl_widget.sync_layer)
-
-
-
+        self.layer_slider.valueChanged.connect(self.layer_lcd.display)
 
     def _loader_cb(self, total, loaded):
         """Show us the progress of the file loading."""

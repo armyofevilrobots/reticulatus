@@ -4,6 +4,7 @@ from PySide import QtOpenGL, QtCore, QtGui
 import logging
 from OpenGL import GL
 from reticulatus.gui import icon
+import math
 #from OpenGL import GLUT
 #from OpenGL import GLU
 #from OpenGL.GL import shaders
@@ -33,10 +34,16 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.y_pan = 0.0
         self.zoom = 100.0
 
+        self.slice_slider = None
+
         self.o_width = 0.0
         self.o_height = 0.0
-        self.layers = ['wireframe', 'polygons', 'platform']
-        self.objects = dict(wireframe=None, polygons=None, platform=None)
+        self.layers = [
+                'wireframe',
+                'polygons',
+                'platform'] #Slices off by default
+        self.objects = dict(
+                wireframe=None, polygons=None, platform=None, slices=None)
         self.colors = dict(
                 wireframe=self.poly_line_color,
                 polygons=self.poly_fill_color,
@@ -46,6 +53,17 @@ class GLWidget(QtOpenGL.QGLWidget):
 
         self.last_pos = QtCore.QPoint()
 
+
+    def set_slice_slider(self, slider):
+        """We set the slider used for slice heights"""
+        self.slice_slider = slider
+        self.slice_slider.valueChanged.connect(self.slider_moved)
+
+
+    def slider_moved(self, value):
+        """We got a change to the slider value."""
+        if 'slices' in self.layers:
+            self.updateGL()
 
 
     def _cleanup(self):
@@ -83,7 +101,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         angle = self.normalizeAngle(angle)
         if angle != self.x_rot:
             self.x_rot = angle
-            #self.emit(QtCore.SIGNAL("x_rotationChanged(int)"), angle)
+            #self.emit(QtCore.SIGNAL("xRotationChanged(int)"), angle)
             self.updateGL()
 
     def set_y_rotation(self, angle):
@@ -91,7 +109,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         angle = self.normalizeAngle(angle)
         if angle != self.y_rot:
             self.y_rot = angle
-            #self.emit(QtCore.SIGNAL("y_rotationChanged(int)"), angle)
+            #self.emit(QtCore.SIGNAL("yRotationChanged(int)"), angle)
             self.updateGL()
 
     def set_z_rotation(self, angle):
@@ -99,7 +117,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         angle = self.normalizeAngle(angle)
         if angle != self.z_rot:
             self.z_rot = angle
-            #self.emit(QtCore.SIGNAL("z_rotationChanged(int)"), angle)
+            #self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
             self.updateGL()
 
     def initializeGL(self):
@@ -118,8 +136,20 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glEnable(GL.GL_MULTISAMPLE)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
 
+    def _get_slice_height(self):
+        if not self.slice_slider:
+            return 9999999
+        else:
+            return 1.0*self.slice_slider.value()
+
+
     def paintGL(self):
         """Redraw"""
+        if 'slices' in self.layers:
+            GL.glEnable(GL.GL_CLIP_PLANE0)
+            GL.glClipPlane(GL.GL_CLIP_PLANE0, (0, 0, -1, self._get_slice_height()))
+        else:
+            GL.glDisable(GL.GL_CLIP_PLANE0)
         GL.glDepthFunc(GL.GL_LEQUAL)
         GL.glDepthMask(GL.GL_TRUE)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
@@ -132,6 +162,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         for layer in sorted(self.layers):
             if layer == 'wireframe':
                 GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE )
+            elif layer == 'clip':
+                pass
             else:
                 GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_FILL )
                 if layer != 'platform':
@@ -173,6 +205,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         """Drag, rotate."""
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
+        if event.modifiers() & QtCore.Qt.ControlModifier:
+            print "Modifiers", event.modifiers()
 
         if event.buttons() & QtCore.Qt.LeftButton:
             self.x_pan += 50*dx/self.zoom
@@ -180,7 +214,7 @@ class GLWidget(QtOpenGL.QGLWidget):
             self.log.info("Panned to %3.3f, %3.3f", self.x_pan, self.y_pan)
             self.updateGL()
         elif event.buttons() & QtCore.Qt.RightButton:
-            self.set_x_rotation(self.x_rot - 0.5 * dy)
+            self.set_x_rotation(self.x_rot + 0.5 * dy)
             self.set_z_rotation(self.z_rot + 0.5 * dx)
             self.log.info("Now rotated to: %3.3d, %3.3d",
                     self.x_rot, self.z_rot)
@@ -223,10 +257,12 @@ class GLWidget(QtOpenGL.QGLWidget):
         ICO_PAINT = icon.by_name('paint-brush')
         ICO_LINE = icon.by_name('pencil')
         ICO_PLANE = icon.by_name('grid')
+        ICO_SLICE = icon.by_name('cutter')
         self._iconcache = dict(
                 wireframe=ICO_LINE,
                 polygons=ICO_PAINT,
                 platform=ICO_PLANE,
+                slices = ICO_SLICE,
                 )
         return self._iconcache
 
@@ -238,14 +274,25 @@ class GLWidget(QtOpenGL.QGLWidget):
             return
         lwidg = parent.layer_list_widget
         lwidg.clear()
+        layers = list(self.layers)
+        #Fixup missing layers
+        for layer in ['wireframe', 'polygons', 'platform', 'slices', ]:
+            if not layer in layers:
+                layers.append(layer)
 
-        for layer in self.layers:
-            witem = QtGui.QListWidgetItem(self._icons[layer], layer)
+        for layer in layers:
+            if self._icons.has_key(layer):
+                witem = QtGui.QListWidgetItem(self._icons[layer], layer)
+            else:
+                witem = QtGui.QListWidgetItem(layer)
             lwidg.addItem(
                     witem
                     )
-            witem.setCheckState(QtCore.Qt.CheckState.Checked)
-            assert witem.icon() is not None
+            if layer != 'slices':
+                witem.setCheckState(QtCore.Qt.CheckState.Checked)
+            else:
+                witem.setCheckState(QtCore.Qt.CheckState.Unchecked)
+            #assert witem.icon() is not None
 
 
 
@@ -294,6 +341,8 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def load_object(self, stl, color):
         """Loads the object from an stl."""
+        self.bottom = None
+        self.top = None
         obj_genlist = GL.glGenLists(1)
         GL.glNewList(obj_genlist, GL.GL_COMPILE)
 
@@ -305,10 +354,20 @@ class GLWidget(QtOpenGL.QGLWidget):
             GL.glNormal3d(*facet['n'])
             for point in facet['p']:
                 #self.log.debug('Adding point %s', point)
+                if point[2] < self.bottom or self.bottom is None:
+                    self.bottom = point[2]
+                if point[2] > self.top or self.bottom is None:
+                    self.top = point[2]
                 GL.glVertex3d(*point)
+
 
         GL.glEnd()
         GL.glEndList()
+
+        if self.slice_slider is not None:
+            self.slice_slider.setMinimum(math.floor(self.bottom))
+            self.slice_slider.setMaximum(math.ceil(self.top))
+
 
         return obj_genlist
 
