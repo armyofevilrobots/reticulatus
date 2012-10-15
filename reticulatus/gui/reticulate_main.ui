@@ -55,7 +55,7 @@
         <item alignment="Qt::AlignHCenter">
          <widget class="QFrame" name="frame">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -78,21 +78,21 @@
           <property name="lineWidth">
            <number>0</number>
           </property>
-          <layout class="QVBoxLayout" name="slider_container_layout" stretch="1,0">
+          <layout class="QVBoxLayout" name="slider_container_layout" stretch="0,0">
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
            <item alignment="Qt::AlignHCenter">
             <widget class="QSlider" name="layer_slider">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
              <property name="maximumSize">
               <size>
-               <width>200</width>
+               <width>50</width>
                <height>16777215</height>
               </size>
              </property>

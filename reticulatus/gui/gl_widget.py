@@ -5,6 +5,8 @@ import logging
 from OpenGL import GL
 from reticulatus.gui import icon
 import math
+from .shaders import get_shader
+from OpenGL.GL import shaders
 #from OpenGL import GLUT
 #from OpenGL import GLU
 #from OpenGL.GL import shaders
@@ -21,10 +23,13 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.log.info("Generating glwidget")
         QtOpenGL.QGLWidget.__init__(self, parent)
 
-        self.poly_line_color = QtGui.QColor.fromCmykF(0.40, 0.0, 1.0, 0.3)
-        self.poly_fill_color =  QtGui.QColor.fromCmykF(0.40, 0.8, 1.0, 0.0)
+        self.poly_line_color = QtGui.QColor.fromRgbF(0.2, 0.2, 0.1, 1)
+        self.poly_fill_color =  QtGui.QColor.fromRgbF(0.4, 0.4, 0.4, 1)
         self.gl_bg_color = QtGui.QColor.fromCmykF(0.19, 0.19, 0.0, 0.0)
         self.gl_platform_color = QtGui.QColor.fromRgbF(0.5, 0.5, 0.5, 0.5)
+        #self.vertex = None
+        #self.fragment = None
+        self.shader = None
 
         self.x_rot = 90.0
         self.y_rot = 0.0
@@ -50,6 +55,8 @@ class GLWidget(QtOpenGL.QGLWidget):
                 platform=self.gl_platform_color,
                 _background=self.gl_bg_color)
         self._iconcache = None
+        self.bottom = None
+        self.top = None
 
         self.last_pos = QtCore.QPoint()
 
@@ -60,7 +67,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.slice_slider.valueChanged.connect(self.slider_moved)
 
 
-    def slider_moved(self, value):
+    def slider_moved(self, _):
         """We got a change to the slider value."""
         if 'slices' in self.layers:
             self.updateGL()
@@ -123,7 +130,8 @@ class GLWidget(QtOpenGL.QGLWidget):
     def initializeGL(self):
         """Init"""
         self.qglClearColor(self.gl_bg_color.darker())
-        GL.glShadeModel(GL.GL_FLAT)
+
+        #GL.glShadeModel(GL.GL_FLAT)
         GL.glEnable(GL.GL_DEPTH_TEST)
 
         GL.glClearDepth(1.0)
@@ -131,34 +139,96 @@ class GLWidget(QtOpenGL.QGLWidget):
         #Fix up the lines to be cleaner...
         GL.glEnable(GL.GL_LINE_SMOOTH)
         GL.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST)
-        GL.glLineWidth(2)
+        GL.glLineWidth(0.1)
         GL.glEnable(GL.GL_BLEND)
         GL.glEnable(GL.GL_MULTISAMPLE)
+        GL.glEnable(GL.GL_LIGHTING)
+        GL.glEnable(GL.GL_LIGHT0)
+        GL.glEnable(GL.GL_NORMALIZE)
+        GL.glEnable(GL.GL_LIGHT1)
+
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
 
+        #self.vertex, self.fragment = get_shader()
+        #self.shader = get_shader()
+
+        #THis is all SHAMELESSLY copied from the tutes at
+        #http://pyopengl.sourceforge.net/context/tutorials/shader_5.xhtml
+        #I will be gutting and replacing with something more appropriate
+        #later on, but for now, let's get it running
+        #for uniform in (
+            #'Global_ambient',
+            #'Light_ambient','Light_diffuse','Light_location',
+            #'Material_ambient','Material_diffuse',
+        #):
+            #location = GL.glGetUniformLocation( self.shader, uniform )
+            #if location in (None,-1):
+                #print 'Warning, no uniform: %s'%( uniform )
+            #setattr( self, uniform+ '_loc', location )
+        #for attribute in (
+            #'Vertex_position','Vertex_normal',
+        #):
+            #location = GL.glGetAttribLocation( self.shader, attribute )
+            #if location in (None,-1):
+                #print 'Warning, no attribute: %s'%( uniform )
+            #setattr( self, attribute+ '_loc', location )
+        #GL.glUseProgram(self.shader)
+        #GL.glUniform4f( self.Global_ambient_loc, .3,.05,.05,.1 )
+
+        GL.glEnable(GL.GL_COLOR_MATERIAL)
+
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, [0.6, 0.6, 0.6, 1.0])
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, [0.3, 0.3, 0.3, 1.0])
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, [0.5, 0.5, 0.5, 1.0])
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, 10.0)
+        GL.glColorMaterial(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT_AND_DIFFUSE)
+        GL.glLightModeli(
+                GL.GL_LIGHT_MODEL_COLOR_CONTROL,
+                GL.GL_SINGLE_COLOR
+                )
+        GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1)
+
+
+    def set_light_positions(self):
+        """Set the light positions."""
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, [100, 0, -1000, 0])
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_QUADRATIC_ATTENUATION, 100.0)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, [0.3, 0.3, 0.3, 0])
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, [0.7, 0.7, 0.7, 0])
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, [0.5, 0.5, 0.5, 0])
+
+        GL.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, [-100, 0, -1000, 0])
+        GL.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, [0.3, 0.3, 0.3, 0])
+        GL.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, [0.4, 0.4, 0.4, 0])
+        GL.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR, [0.4, 0.4, 0.4, 0])
+
     def _get_slice_height(self):
+        """Helper to get the slice limits."""
         if not self.slice_slider:
             return 9999999
         else:
-            return 1.0*self.slice_slider.value()
+            return 0.005+1.0*self.slice_slider.value()
 
 
     def paintGL(self):
         """Redraw"""
-        if 'slices' in self.layers:
-            GL.glEnable(GL.GL_CLIP_PLANE0)
-            GL.glClipPlane(GL.GL_CLIP_PLANE0, (0, 0, -1, self._get_slice_height()))
-        else:
-            GL.glDisable(GL.GL_CLIP_PLANE0)
         GL.glDepthFunc(GL.GL_LEQUAL)
         GL.glDepthMask(GL.GL_TRUE)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+        GL.glClipPlane(GL.GL_CLIP_PLANE0,
+                (0, 0, -1, self._get_slice_height()))
         GL.glLoadIdentity()
         GL.glScaled(self.zoom/100, self.zoom/100, self.zoom/100)
+        self.set_light_positions()
         GL.glTranslated(self.x_pan, self.y_pan, 0.1)
         GL.glRotated(self.x_rot , 1.0, 0.0, 0.0)
         GL.glRotated(self.y_rot , 0.0, 1.0, 0.0)
         GL.glRotated(self.z_rot , 0.0, 0.0, 1.0)
+        #GL.glUseProgram(0)
+        if 'slices' in self.layers:
+            GL.glEnable(GL.GL_CLIP_PLANE0)
+        else:
+            GL.glDisable(GL.GL_CLIP_PLANE0)
         for layer in sorted(self.layers):
             if layer == 'wireframe':
                 GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE )
@@ -193,11 +263,18 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.last_pos = QtCore.QPoint(event.pos())
 
     def wheelEvent(self, event):
+        """We got a scroll. Change the zoom."""
+        GL.glClipPlane(GL.GL_CLIP_PLANE0,
+                (0, 0, -1, self._get_slice_height()))
         num_degrees = event.delta() / 8.0
         num_steps = num_degrees
         self.zoom += num_steps
-        if self.zoom < 100.0:
-            self.zoom = 100.0
+        if self.zoom < 30.0:
+            self.zoom = 30.0
+        parent = self.window()
+        parent.statusBar().showMessage("Zoom: %3.3f" % (self.zoom/100.0))
+
+
         self.updateGL()
 
 
@@ -205,15 +282,21 @@ class GLWidget(QtOpenGL.QGLWidget):
         """Drag, rotate."""
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
-        if event.modifiers() & QtCore.Qt.ControlModifier:
-            print "Modifiers", event.modifiers()
 
-        if event.buttons() & QtCore.Qt.LeftButton:
+        if (
+                (event.buttons() & QtCore.Qt.LeftButton)
+                and not
+                (event.modifiers() & QtCore.Qt.ControlModifier)):
             self.x_pan += 50*dx/self.zoom
             self.y_pan += 50*dy/self.zoom
             self.log.info("Panned to %3.3f, %3.3f", self.x_pan, self.y_pan)
             self.updateGL()
-        elif event.buttons() & QtCore.Qt.RightButton:
+        elif (
+                (event.buttons() & QtCore.Qt.RightButton)
+                or
+                ((event.buttons() & QtCore.Qt.LeftButton)
+                    and
+                    (event.modifiers() & QtCore.Qt.ControlModifier))):
             self.set_x_rotation(self.x_rot + 0.5 * dy)
             self.set_z_rotation(self.z_rot + 0.5 * dx)
             self.log.info("Now rotated to: %3.3d, %3.3d",
@@ -315,14 +398,14 @@ class GLWidget(QtOpenGL.QGLWidget):
 
         self.qglColor(color)
         GL.glNormal3d(0.0, 0.0, 1.0)
-        GL.glVertex3d(-100.0, 100, 0.0)
-        GL.glVertex3d(100.0, 100, 0.0)
-        GL.glVertex3d(100.0, -100.0, 0.0)
+        GL.glVertex3d(-100.0, 100, -0.01)
+        GL.glVertex3d(100.0, 100, -0.01)
+        GL.glVertex3d(100.0, -100.0, -0.01)
 
         GL.glNormal3d(0.0, 0.0, 1.0)
-        GL.glVertex3d(-100.0, 100, 0.0)
-        GL.glVertex3d(100.0, -100, 0.0)
-        GL.glVertex3d(-100.0, -100.0, 0.0)
+        GL.glVertex3d(-100.0, 100, -0.01)
+        GL.glVertex3d(100.0, -100, -0.01)
+        GL.glVertex3d(-100.0, -100.0, -0.01)
 
         #GL.glNormal3d(0.0, 0.0, -1.0)
         #GL.glVertex3d(-101.0, 100, 0.0001)
@@ -370,16 +453,6 @@ class GLWidget(QtOpenGL.QGLWidget):
 
 
         return obj_genlist
-
-
-    def extrude(self, x1, y1, x2, y2):
-        """Extrude a wall"""
-        self.qglColor(self.poly_line_color.darker(250 + int(100 * x1)))
-
-        GL.glVertex3d(x1, y1, +0.05)
-        GL.glVertex3d(x2, y2, +0.05)
-        GL.glVertex3d(x2, y2, -0.05)
-        GL.glVertex3d(x1, y1, -0.05)
 
     def normalizeAngle(self, angle):
         """Keep in 0-360"""

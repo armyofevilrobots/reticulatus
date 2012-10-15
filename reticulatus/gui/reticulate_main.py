@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'reticulate_main.ui'
 #
-# Created: Sun Oct 14 20:06:28 2012
+# Created: Sun Oct 14 23:55:19 2012
 #      by: pyside-uic 0.2.13 running on PySide 1.1.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -38,7 +38,7 @@ class Ui_main_window(object):
         self.object_3d_layout = QtGui.QHBoxLayout(self.object_3d)
         self.object_3d_layout.setObjectName("object_3d_layout")
         self.frame = QtGui.QFrame(self.object_3d)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
@@ -53,12 +53,12 @@ class Ui_main_window(object):
         self.slider_container_layout.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
         self.slider_container_layout.setObjectName("slider_container_layout")
         self.layer_slider = QtGui.QSlider(self.frame)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.layer_slider.sizePolicy().hasHeightForWidth())
         self.layer_slider.setSizePolicy(sizePolicy)
-        self.layer_slider.setMaximumSize(QtCore.QSize(200, 16777215))
+        self.layer_slider.setMaximumSize(QtCore.QSize(50, 16777215))
         self.layer_slider.setMinimum(0)
         self.layer_slider.setMaximum(9999)
         self.layer_slider.setProperty("value", 0)
@@ -75,7 +75,6 @@ class Ui_main_window(object):
         self.layer_lcd.setNumDigits(4)
         self.layer_lcd.setObjectName("layer_lcd")
         self.slider_container_layout.addWidget(self.layer_lcd)
-        self.slider_container_layout.setStretch(0, 1)
         self.object_3d_layout.addWidget(self.frame)
         self.object_tabs.addTab(self.object_3d, "")
         self.gcode = QtGui.QWidget()
