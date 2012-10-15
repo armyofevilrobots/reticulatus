@@ -30,16 +30,16 @@ so that I could get the most bang with the least effort. Productivity
 through pathological laziness!
 
 Currently working:
- - STL parsing (thanks https://github.com/sconklin!)
+ - GUI interface: http://youtu.be/4cn2QE-PHxA?hd=1
  - Conversion of STL to CGAL polymesh
  - CGAL polymesh to layered planar perimeters
+ - STL parsing (thanks https://github.com/sconklin!)
  - Planar perimeter inset based on tool width
  - Multiple perimeters
- - GUI interface: http://youtu.be/4cn2QE-PHxA?hd=1
+ - Full 3d LIVE PREVIEW of printable objects and layers
 
 Coming soon:
  - Cross hatched infill
- - Full 3d LIVE PREVIEW of printable objects and layers
  - Realtime slicing
  - Full multiprocessor support (via multiprocessing) for both
    slicing and perimeters/infills.
