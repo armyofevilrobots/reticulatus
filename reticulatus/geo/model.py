@@ -7,6 +7,7 @@ from CGAL.CGAL_AABB_tree import AABB_tree_Polyhedron_3_Facet_handle
 import logging
 from futures import ThreadPoolExecutor, ProcessPoolExecutor
 from reticulatus.worker import Worker
+from numpy import array, append
 
 LOGGER = logging.getLogger(__file__)
 
@@ -17,21 +18,29 @@ class Model:
     """
     def __init__(self, facets):
         """Facets is an iterable containing a set of x,y,z tuples"""
-        self.poly = Polyhedron_3()
-        for facet in facets:
+        self.mesh = facets #list(facets) #list()
+        self.poly = self._poly_from_mesh(self.mesh)
+
+
+    def _poly_from_mesh(self, mesh):
+        """Refactoring out to make this independent."""
+        poly = Polyhedron_3()
+        for facet in mesh:
             #Yes yes yes, I know, * magic, but it's _FASTER_
-            points = [Point_3(*point) for point in facet]
+            points = [Point_3(*point) for point in facet[0]]
             if len(points) == 3:
-                self.poly.make_triangle(*points)
+                poly.make_triangle(*points)
             else:
                 raise RuntimeError, (
                         "Invalid point list for poly facet: %d sides" %
                         len(points))
+        return poly
+
 
     @classmethod
     def from_stl(cls, stl):
         """Generates a Model from an STL"""
-        return cls(facets = (facet['p'] for facet in stl.facets))
+        return cls(facets = [(facet['p'], facet['n']) for facet in stl.facets])
 
 
     def _intersection_to_segments(self, intersections, accuracy=4):

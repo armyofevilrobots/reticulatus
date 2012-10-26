@@ -9,6 +9,7 @@ from .reticulate_main import Ui_main_window
 from .gl_widget import GLWidget
 import icon
 from ..geo.stl import STL
+from ..project import Project
 
 #QT warnings due to pep8 != QT
 # pylint: disable=C0103
@@ -23,6 +24,7 @@ class MainWindow(QMainWindow, Ui_main_window):
         self.setupUi(self)
         self.setWindowTitle('Reticulatus')
         self.setWindowIcon(icon.by_name('spectacle-3d'))
+        self.project = None
 
         self.basedir = os.getcwd()
 
@@ -38,9 +40,7 @@ class MainWindow(QMainWindow, Ui_main_window):
         self.action_quit.triggered.connect(self.close)
         self.action_open.setStatusTip('Open new File')
         self.action_open.triggered.connect(self.load_stl_file)
-        #self.connect(self.layer_list_widget,
-                #SIGNAL("itemClicked(QListWidgetItem *)"),
-                    #self.gl_widget.toggle_layer)
+        self.action_new.triggered.connect(self.reset_model)
         self.connect(self.layer_list_widget,
                 SIGNAL("itemChanged(QListWidgetItem *)"),
                     self.gl_widget.sync_layer)
@@ -69,14 +69,13 @@ class MainWindow(QMainWindow, Ui_main_window):
             self.statusBar().showMessage("No file selected.")
             return
         stl = STL(fname)
-        #stl.debug=True
         now = time.time()
         stl.read(self._loader_cb)
         self.log.info("Loaded %s", stl)
         self.statusBar().showMessage("Processing...")
-        if fname:
-            self.gl_widget.set_object(stl)
-            self.basedir = os.path.dirname(fname)
+        self.project = Project.from_stl(stl)
+        self.gl_widget.set_project(self.project)
+        self.basedir = os.path.dirname(fname)
         self.statusBar().showMessage(
                 "Loaded model %s with %d polygons in %0.1f seconds" %
                 (
@@ -85,6 +84,10 @@ class MainWindow(QMainWindow, Ui_main_window):
                     time.time()-now
                     )
                 )
+
+    def reset_model(self):
+        """Basically just clear everything."""
+        self.gl_widget.reset_model()
 
 
 

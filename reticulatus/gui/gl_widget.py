@@ -8,8 +8,9 @@ import math
 from .shaders import get_shader
 from OpenGL.GL import shaders
 #from OpenGL import GLUT
-#from OpenGL import GLU
+from OpenGL import GLE #Cylinders.
 #from OpenGL.GL import shaders
+
 
 
 
@@ -22,43 +23,16 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.log = logging.getLogger(__name__)
         self.log.info("Generating glwidget")
         QtOpenGL.QGLWidget.__init__(self, parent)
+        self.slice_slider = None
 
         self.poly_line_color = QtGui.QColor.fromRgbF(0.2, 0.2, 0.1, 1)
+        self.perimeter_color = QtGui.QColor.fromRgbF(0.2, 0.2, 0.5, 1)
         self.poly_fill_color =  QtGui.QColor.fromRgbF(0.4, 0.4, 0.4, 1)
         self.gl_bg_color = QtGui.QColor.fromCmykF(0.19, 0.19, 0.0, 0.0)
         self.gl_platform_color = QtGui.QColor.fromRgbF(0.5, 0.5, 0.5, 0.5)
-        #self.vertex = None
-        #self.fragment = None
         self.shader = None
+        self.reset_model()
 
-        self.x_rot = 90.0
-        self.y_rot = 0.0
-        self.z_rot = 0.0
-
-        self.x_pan = 0.0
-        self.y_pan = 0.0
-        self.zoom = 100.0
-
-        self.slice_slider = None
-
-        self.o_width = 0.0
-        self.o_height = 0.0
-        self.layers = [
-                'wireframe',
-                'polygons',
-                'platform'] #Slices off by default
-        self.objects = dict(
-                wireframe=None, polygons=None, platform=None, slices=None)
-        self.colors = dict(
-                wireframe=self.poly_line_color,
-                polygons=self.poly_fill_color,
-                platform=self.gl_platform_color,
-                _background=self.gl_bg_color)
-        self._iconcache = None
-        self.bottom = None
-        self.top = None
-
-        self.last_pos = QtCore.QPoint()
 
 
     def set_slice_slider(self, slider):
@@ -149,31 +123,6 @@ class GLWidget(QtOpenGL.QGLWidget):
 
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
 
-        #self.vertex, self.fragment = get_shader()
-        #self.shader = get_shader()
-
-        #THis is all SHAMELESSLY copied from the tutes at
-        #http://pyopengl.sourceforge.net/context/tutorials/shader_5.xhtml
-        #I will be gutting and replacing with something more appropriate
-        #later on, but for now, let's get it running
-        #for uniform in (
-            #'Global_ambient',
-            #'Light_ambient','Light_diffuse','Light_location',
-            #'Material_ambient','Material_diffuse',
-        #):
-            #location = GL.glGetUniformLocation( self.shader, uniform )
-            #if location in (None,-1):
-                #print 'Warning, no uniform: %s'%( uniform )
-            #setattr( self, uniform+ '_loc', location )
-        #for attribute in (
-            #'Vertex_position','Vertex_normal',
-        #):
-            #location = GL.glGetAttribLocation( self.shader, attribute )
-            #if location in (None,-1):
-                #print 'Warning, no attribute: %s'%( uniform )
-            #setattr( self, attribute+ '_loc', location )
-        #GL.glUseProgram(self.shader)
-        #GL.glUniform4f( self.Global_ambient_loc, .3,.05,.05,.1 )
 
         GL.glEnable(GL.GL_COLOR_MATERIAL)
 
@@ -234,13 +183,33 @@ class GLWidget(QtOpenGL.QGLWidget):
                 GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE )
             elif layer == 'clip':
                 pass
+            elif layer == 'slices':
+                pass
             else:
                 GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_FILL )
                 if layer != 'platform':
                     GL.glPolygonOffset(1, 1)
+
             self.log.info("Painting: %s" % layer)
             if self.objects[layer] is not None:
                 GL.glCallList(self.objects[layer])
+
+        #GLE.gleSetNumSides(6)
+        #GLE.glePolyCylinder(
+                #[(0,0,z/10.0) for z in range(100)],
+                #[(.2,.2,.8,1.0) for i in range(100)],
+                #0.25)
+        print self.layers
+        if 'slices' in self.layers:
+            self.qglColor(self.perimeter_color)
+            GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_FILL )
+            GLE.gleExtrusion(
+                    [(-.5,0), (0,.1), (.5,0), (0,-.1), (-.5,0)],
+                    None,
+                    (0,1,0),
+                    [(0,0, z*0.1) for z in range(10000)],
+                    None)
+
 
 
     def resizeGL(self, width, height):
@@ -377,14 +346,27 @@ class GLWidget(QtOpenGL.QGLWidget):
                 witem.setCheckState(QtCore.Qt.CheckState.Unchecked)
             #assert witem.icon() is not None
 
+    def slice_to_layer(self, the_layer, zpos, height=0.1):
+        """Returns a set of tubes that are set up to be displayed to
+        represent the extrusions on a layer.
+        @return glgenlist
+        """
+        obj_genlist = GL.glGenLists(1)
+        GL.glNewList(obj_genlist, GL.GL_COMPILE)
 
+        GL.glBegin(GL.GL_LINES)
+        GL.glEnd()
 
+    def set_project(self, project):
+        """Sets the project, nice for having
+        access to the misc details it contains."""
+        self.set_object(project.model)
 
-    def set_object(self, stl):
-        """Set the object from an stl"""
+    def set_object(self, model):
+        """Set the object from an model"""
         self._cleanup()
-        self.objects['wireframe'] = self.load_object(stl, self.poly_line_color)
-        self.objects['polygons'] = self.load_object(stl, self.poly_fill_color)
+        self.objects['wireframe'] = self.load_object(model, self.poly_line_color)
+        self.objects['polygons'] = self.load_object(model, self.poly_fill_color)
         self.objects['platform'] = self._build_plane(self.gl_platform_color)
         self._sync_listwidget()
         self.initializeGL()
@@ -422,7 +404,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         return plane_genlist
 
 
-    def load_object(self, stl, color):
+    def load_object(self, model, color):
         """Loads the object from an stl."""
         self.bottom = None
         self.top = None
@@ -432,18 +414,16 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glBegin(GL.GL_TRIANGLES)
 
         self.qglColor(color)
-        self.log.info("This STL has %d facets", len(stl.facets))
-        for facet in stl.facets:
-            GL.glNormal3d(*facet['n'])
-            for point in facet['p']:
+        for triangle in model.mesh:
+            GL.glNormal3d(*triangle[1])
+            for point in triangle[0]:
                 #self.log.debug('Adding point %s', point)
                 if point[2] < self.bottom or self.bottom is None:
                     self.bottom = point[2]
                 if point[2] > self.top or self.bottom is None:
                     self.top = point[2]
                 GL.glVertex3d(*point)
-
-
+        self.log.info("This model has %d facets", model.poly.size_of_facets())
         GL.glEnd()
         GL.glEndList()
 
@@ -461,3 +441,35 @@ class GLWidget(QtOpenGL.QGLWidget):
         while angle > 360 * 16:
             angle -= 360 * 16
         return angle
+
+    def reset_model(self):
+        """Clear and reset everything."""
+        self.x_rot = 90.0
+        self.y_rot = 0.0
+        self.z_rot = 0.0
+
+        self.x_pan = 0.0
+        self.y_pan = 0.0
+        self.zoom = 100.0
+
+
+        self.o_width = 0.0
+        self.o_height = 0.0
+        self._iconcache = None
+        self.layers = [
+                'wireframe',
+                'polygons',
+                'platform'] #Slices off by default
+        self.objects = dict(
+                wireframe=None, polygons=None, platform=None, slices=None)
+        self.colors = dict(
+                wireframe=self.poly_line_color,
+                polygons=self.poly_fill_color,
+                platform=self.gl_platform_color,
+                _background=self.gl_bg_color)
+        self.bottom = None
+        self.top = None
+
+        self.last_pos = QtCore.QPoint()
+        self._sync_listwidget()
+

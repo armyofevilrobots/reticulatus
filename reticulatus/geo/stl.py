@@ -136,7 +136,7 @@ class STL():
             raise ValueError(
                     'Found unexpected line <%s> when expecting vertex' %
                     lparts)
-        return [float(lparts[1]), float(lparts[2]), float(lparts[3])]
+        return ((float(lparts[1]), float(lparts[2]), float(lparts[3])))
 
     ## __ascii_read_triangle
     #
@@ -167,7 +167,7 @@ class STL():
         if (lparts[0] != 'facet') or (lparts[1] != 'normal'):
             raise ValueError(
                     'Found unexpected line <%s> when expecting facet' % line)
-        n = [float(lparts[2]), float(lparts[3]), float(lparts[4])]
+        n = (float(lparts[2]), float(lparts[3]), float(lparts[4]))
 
         # "outer loop"
         if self._readFD.readline().strip() != 'outer loop':
@@ -335,7 +335,7 @@ class STL():
                     facet = dict()
                     (n, p1, p2, p3, b) =  self.__ascii_read_triangle()
                     facet['n'] = n
-                    facet['p'] = [p1, p2, p3]
+                    facet['p'] = (p1, p2, p3)
                     facet['a'] = b
                     #print "Found facet: ", facet
                     self._facets.append(facet)
@@ -349,8 +349,8 @@ class STL():
         """
         Add a facet to the internal list. Normal defaults to all zeros. Attribute defaults to zero
         """
-        n = n or [0.0,0.0,0.0]
-        self._facets.append([n, p, a])
+        n = n or (0.0,0.0,0.0)
+        self._facets.append((n, p, a))
         return
 
     ## addFace
@@ -360,9 +360,9 @@ class STL():
         Add a four point face to the internal list. Normal defaults to all zeros. Attribute defaults to zero
         Addition follows a right hand rule, assigning facets from points 1,2,3 then 1,3,4
         """
-        n = n or [0.0,0.0,0.0]
-        self.addFacet([pointlist[0], pointlist[1], pointlist[2]])
-        self.addFacet([pointlist[0], pointlist[2], pointlist[3]])
+        n = n or (0.0,0.0,0.0)
+        self.addFacet((pointlist[0], pointlist[1], pointlist[2]))
+        self.addFacet((pointlist[0], pointlist[2], pointlist[3]))
 
         return
 
