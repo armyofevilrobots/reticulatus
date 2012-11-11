@@ -61,6 +61,7 @@ class Model:
                         )
                 if start != end:
                     lines.append((start, end))
+            LOGGER.debug("Made lines: %s", lines)
         return lines
 
 

@@ -188,9 +188,9 @@
     <property name="title">
      <string>&amp;Settings</string>
     </property>
-    <addaction name="action_print"/>
-    <addaction name="action_slice"/>
-    <addaction name="action_Display"/>
+    <addaction name="action_print_settings"/>
+    <addaction name="action_slice_settings"/>
+    <addaction name="action_display_settings"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -204,7 +204,7 @@
     <property name="title">
      <string>&amp;Actions</string>
     </property>
-    <addaction name="action_Slice"/>
+    <addaction name="action_slice"/>
    </widget>
    <widget class="QMenu" name="menu_Windows">
     <property name="title">
@@ -296,12 +296,12 @@
     <string>&amp;Quit</string>
    </property>
   </action>
-  <action name="action_print">
+  <action name="action_print_settings">
    <property name="text">
     <string>&amp;Printer</string>
    </property>
   </action>
-  <action name="action_slice">
+  <action name="action_slice_settings">
    <property name="text">
     <string>S&amp;licing</string>
    </property>
@@ -316,12 +316,12 @@
     <string>&amp;About</string>
    </property>
   </action>
-  <action name="action_Display">
+  <action name="action_display_settings">
    <property name="text">
     <string>&amp;Display</string>
    </property>
   </action>
-  <action name="action_Slice">
+  <action name="action_slice">
    <property name="text">
     <string>&amp;Slice</string>
    </property>

@@ -32,6 +32,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.gl_platform_color = QtGui.QColor.fromRgbF(0.5, 0.5, 0.5, 0.5)
         self.shader = None
         self.reset_model()
+        self.project = None
 
 
 
@@ -156,7 +157,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         if not self.slice_slider:
             return 9999999
         else:
-            return 0.005+1.0*self.slice_slider.value()
+            return 0.3 + (0.2*self.slice_slider.value())
 
 
     def paintGL(self):
@@ -194,21 +195,29 @@ class GLWidget(QtOpenGL.QGLWidget):
             if self.objects[layer] is not None:
                 GL.glCallList(self.objects[layer])
 
-        #GLE.gleSetNumSides(6)
-        #GLE.glePolyCylinder(
-                #[(0,0,z/10.0) for z in range(100)],
-                #[(.2,.2,.8,1.0) for i in range(100)],
-                #0.25)
-        print self.layers
+        #This is how we draw perimiters baby!
         if 'slices' in self.layers:
-            self.qglColor(self.perimeter_color)
-            GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_FILL )
-            GLE.gleExtrusion(
-                    [(-.5,0), (0,.1), (.5,0), (0,-.1), (-.5,0)],
-                    None,
-                    (0,1,0),
-                    [(0,0, z*0.1) for z in range(10000)],
-                    None)
+            layernum = self.slice_slider.value()
+            zpos = self._get_slice_height()
+            if (self.project is not None
+                    and self.project.layers is not None
+                    and len(self.project.layers) >= self.slice_slider.value()
+                ):
+                self.qglColor(self.perimeter_color)
+                GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_FILL )
+                for poly in self.project.layers[layernum].polys:
+                    exterior = [(point[0], point[1], zpos-0.15)
+                            for point in poly.exterior.coords]
+                    startp = exterior[0]
+                    endp = exterior[-1]
+                    exterior.append(startp)
+                    exterior.insert(0, endp)
+                    GLE.gleExtrusion(
+                            [(-.5,0), (0,.1), (.5,0), (0,-.1), (-.5,0)],
+                            None,
+                            (0, 0, 1),
+                            exterior,
+                            None)
 
 
 
@@ -361,6 +370,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         """Sets the project, nice for having
         access to the misc details it contains."""
         self.set_object(project.model)
+        self.project = project
 
     def set_object(self, model):
         """Set the object from an model"""

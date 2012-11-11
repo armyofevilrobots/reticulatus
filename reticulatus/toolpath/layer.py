@@ -12,7 +12,17 @@ class Layer:
     """
 
     def __init__(self, polys):
-        self.polys = polys
+        self.polys = tuple(polys)
+
+    def __repr__(self):
+        """Something pretty to show."""
+        #return "|".join([str(
+            #tuple(poly.exterior.coords)) for
+            #poly in self.polys])
+        return str([
+            tuple(poly.exterior.coords) for poly in
+            self.polys])
+
 
     def eroded(self, distance):
         """Generates eroded polys"""
