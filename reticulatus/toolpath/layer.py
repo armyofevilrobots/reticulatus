@@ -2,6 +2,7 @@
 Represents a single layer based on slices from the 3d model.
 """
 import shapely.ops
+from shapely.geometry import MultiPolygon
 
 class Layer:
     """
@@ -12,7 +13,13 @@ class Layer:
     """
 
     def __init__(self, polys):
-        self.polys = tuple(polys)
+        self.polys = polys
+        #if isinstance(polys, MultiPolygon):
+            #self.polys = polys #Now expect multipolygon
+        #else:
+            #self.polys = polys
+
+
 
     def __repr__(self):
         """Something pretty to show."""
@@ -37,7 +44,11 @@ class Layer:
     @classmethod
     def from_lines(cls, lines):
         """Generates a layer from a set of lines"""
-        polys = shapely.ops.polygonize(lines)
+        polys = tuple(shapely.ops.polygonize(lines))
+        #boundary = polys[0]
+        #for poly in polys[1:]:
+            #boundary = boundary.symmetric_difference(poly)
+        #polys = boundary
         return cls(polys)
 
     @classmethod

@@ -2,6 +2,7 @@
 from PySide import QtOpenGL, QtCore, QtGui
 #import math
 import logging
+import math
 from OpenGL import GL
 from reticulatus.gui import icon
 import math
@@ -16,6 +17,8 @@ from OpenGL import GLE #Cylinders.
 
 #QT warnings due to pep8 != QT
 # pylint: disable=C0103
+#We do re-init all the time, so stop complaining about it being refactored.
+# pylint: disable=W0201
 
 class GLWidget(QtOpenGL.QGLWidget):
     """GL Wrapper widget"""
@@ -157,8 +160,36 @@ class GLWidget(QtOpenGL.QGLWidget):
         if not self.slice_slider:
             return 9999999
         else:
-            return 0.3 + (0.2*self.slice_slider.value())
+            if self.project is not None and self.project.layers is not None:
+                if self.slice_slider.value()>len(self.project.layers):
+                    return self.project.layers[-1][0]
+                else:
+                    return self.project.layers[self.slice_slider.value()][0]
+            else:
+                return 0.3 + (0.2*self.slice_slider.value())
 
+
+    def draw_perimeter(self, zofs, outline, width=0.5, height=0.1):
+        """Draws a perimeter layer, good for outlines and loops."""
+        from math import cos, sin
+        extrudeprofile = [
+                (
+                    (width/2.0) *  cos(the * (3.14159 / 8.0)),
+                    (height/2.0) * sin(the * (3.14159 / 8.0))
+                    )
+                for the in xrange(0, 16)
+                ]
+        exterior = [(point[0], point[1], zofs)
+                for point in outline]
+        startp = exterior[0]
+        endp = exterior[-1]
+        exterior.append(startp)
+        GLE.gleExtrusion(
+                extrudeprofile,
+                None,
+                (0, 0, 1),
+                exterior,
+                None)
 
     def paintGL(self):
         """Redraw"""
@@ -166,7 +197,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glDepthMask(GL.GL_TRUE)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         GL.glClipPlane(GL.GL_CLIP_PLANE0,
-                (0, 0, -1, self._get_slice_height()))
+                (0, 0, -1, self._get_slice_height()+0.15))
         GL.glLoadIdentity()
         GL.glScaled(self.zoom/100, self.zoom/100, self.zoom/100)
         self.set_light_positions()
@@ -205,19 +236,23 @@ class GLWidget(QtOpenGL.QGLWidget):
                 ):
                 self.qglColor(self.perimeter_color)
                 GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_FILL )
-                for poly in self.project.layers[layernum].polys:
-                    exterior = [(point[0], point[1], zpos-0.15)
-                            for point in poly.exterior.coords]
-                    startp = exterior[0]
-                    endp = exterior[-1]
-                    exterior.append(startp)
-                    exterior.insert(0, endp)
-                    GLE.gleExtrusion(
-                            [(-.5,0), (0,.1), (.5,0), (0,-.1), (-.5,0)],
-                            None,
-                            (0, 0, 1),
-                            exterior,
-                            None)
+
+                for poly in self.project.perimeters[layernum][1].polys:
+                    if poly.exterior is None:
+                        self.log.info("Interior poly.")
+                        for interior in poly.interiors:
+                            self.log.debug("Interior is %s", interior)
+                        path = None
+                    else:
+                        self.log.info("Exterior poly.")
+                        path = poly.exterior
+
+                    if path:
+                        self.draw_perimeter(
+                                self.project.perimeters[layernum][0],
+                                path.coords,
+                                .5,
+                                .1)
 
 
 
@@ -375,9 +410,12 @@ class GLWidget(QtOpenGL.QGLWidget):
     def set_object(self, model):
         """Set the object from an model"""
         self._cleanup()
-        self.objects['wireframe'] = self.load_object(model, self.poly_line_color)
-        self.objects['polygons'] = self.load_object(model, self.poly_fill_color)
-        self.objects['platform'] = self._build_plane(self.gl_platform_color)
+        self.objects['wireframe'] = self.load_object(
+                model, self.poly_line_color)
+        self.objects['polygons'] = self.load_object(
+                model, self.poly_fill_color)
+        self.objects['platform'] = self._build_plane(
+                self.gl_platform_color)
         self._sync_listwidget()
         self.initializeGL()
 

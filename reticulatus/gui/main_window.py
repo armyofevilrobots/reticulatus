@@ -25,7 +25,7 @@ class MainWindow(QMainWindow, Ui_main_window):
         self.setWindowTitle('Reticulatus')
         self.setWindowIcon(icon.by_name('spectacle-3d'))
         self.project = None
-
+        self.err_dialog = None
         self.basedir = os.getcwd()
 
 
@@ -62,19 +62,35 @@ class MainWindow(QMainWindow, Ui_main_window):
 
     def slice_project(self):
         """Do the slicer."""
-        self.log.info("Slicing %s", self.project)
+        #self.log.info("Slicing %s", self.project)
         if self.project is None:
             self.log.warn("Tried to slice non-existent project.")
             self.err_dialog.showMessage("Failed to slice non-existent project.")
             self.statusBar().showMessage("Cannot slice a non-existent project.")
         else:
-            #TODO: Get this from the config eh?
             now = time.time()
-            self.statusBar().showMessage("Slicing...")
-            self.project.slice(0.3, 0.2, 0.5)
-            self.statusBar().showMessage("Sliced %d layers in %02.1f seconds." %
+            statusbar = self.statusBar()
+            #statusbar.showMessage("Slicing...")
+            #TODO: Get height/start/thickness/etc from the config eh?
+            self.project.slice(0.3, 0.2, 0.5,
+                    callback = lambda x: statusbar.showMessage(x)
+                    )
+            statusbar.showMessage("Sliced %d layers in %02.1f seconds." %
                     (len(self.project.layers), time.time()-now))
+            self.layer_slider.setMaximum(len(self.project.layers))
 
+
+    def _load_stl_file(self, fname):
+        """Actually load it."""
+        stl = STL(fname)
+        stl.read(self._loader_cb)
+        self.log.info("Loaded %s", stl)
+        self.statusBar().showMessage("Processing...")
+        self.project = Project.from_stl(stl)
+        self.gl_widget.set_project(self.project)
+        assert self.gl_widget.project == self.project
+        self.basedir = os.path.dirname(fname)
+        return stl
 
     def load_stl_file(self):
         """Load the stl"""
@@ -86,15 +102,8 @@ class MainWindow(QMainWindow, Ui_main_window):
         if not fname:
             self.statusBar().showMessage("No file selected.")
             return
-        stl = STL(fname)
         now = time.time()
-        stl.read(self._loader_cb)
-        self.log.info("Loaded %s", stl)
-        self.statusBar().showMessage("Processing...")
-        self.project = Project.from_stl(stl)
-        self.gl_widget.set_project(self.project)
-        assert self.gl_widget.project == self.project
-        self.basedir = os.path.dirname(fname)
+        stl = self._load_stl_file(fname)
         self.statusBar().showMessage(
                 "Loaded model %s with %d polygons in %0.1f seconds" %
                 (

@@ -38,22 +38,19 @@ class Project(object):
     def slice(self, initial_height, layer_height, tool_width, callback=None):
         """Slice me into layers!"""
         self.layers = list()
+        callback("Generating perimeter intersections...")
         for plane in self.model.generate_planar_intersections(
                 initial_height, layer_height, 300):
             if len(plane[1]):
-                layer= Layer.from_CGAL_intersections(plane[1])
-                self.layers.append(layer)
+                layer = Layer.from_CGAL_intersections(plane[1])
+                self.layers.append((plane[0], layer))
+                callback("Sliced layer #%d" % len(self.layers))
 
-
-
-
-        #self.layers = [
-                #Layer.from_CGAL_intersections(plane[1]) for
-                    #plane in
-                    #self.model.generate_planar_intersections(initial_height, layer_height, 300)
-                    #if len(plane[1])]
         self.perimeters = [
-                layer.eroded(tool_width/2.0)
+                (
+                    layer[0],
+                    layer[1].eroded(tool_width/2.0)
+                    )
                 for layer in self.layers]
 
 

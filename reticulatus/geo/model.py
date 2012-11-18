@@ -11,6 +11,10 @@ from numpy import array, append
 
 LOGGER = logging.getLogger(__file__)
 
+
+
+
+
 class Model:
     """
     Basically just a wrapper on a CGAL poly, but
@@ -66,7 +70,8 @@ class Model:
 
 
     def generate_planar_intersections(self,
-            start_height, inc_height, max_height, accuracy=4, processes=None):
+            start_height, inc_height, max_height, accuracy=4, processes=None,
+            callback=None):
         """Generates a series of slices from height start_height and then
         every additional inc_height units."""
         #This is a CGAL tree that makes for fast slicening!
@@ -92,6 +97,8 @@ class Model:
             plane_query = Plane_3(Point_3(0, 0, zpos), vec)
             intersections = list()
             tree.all_intersections(plane_query, intersections)
+            if callback is not None:
+                callback("Found intersections at %3.3f z" % zpos)
             return (zpos,
                 self._intersection_to_segments(intersections, accuracy) )
 
@@ -101,6 +108,7 @@ class Model:
         layers = map(_slice, zrange(start_height, inc_height, max_height))
 
         return layers
+
 
 
 
