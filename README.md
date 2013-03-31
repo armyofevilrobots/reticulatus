@@ -59,7 +59,13 @@ Longer term:
  ===========
 
  This slicer/optimizer requires the CGAL bindings for Python, which are a bit
- of a PITA to install correctly. In order to do so, you need to pull the 
+ of a PITA to install correctly. I would generally recommend downloading the
+ complete CGAL library and building it from scratch, then using the newest
+ CGAL-bindings master to build from. If that smacks of effort, then you can 
+ still build based on packaged versions on Ubuntu, but it's error prone and 
+ painful. I haven't done it since 12.04, but the process is shown below:
+ 
+ In order to do so, you need to pull the 
  git repo in the .gitmodule (it should happen automagically), then go into
  the deps/cgal-bindings folder, then issue:
  git checkout e77c16bd5a65 #For example on Ubuntu 12.04

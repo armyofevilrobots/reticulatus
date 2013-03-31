@@ -181,14 +181,29 @@ class GLWidget(QtOpenGL.QGLWidget):
                 ]
         exterior = [(point[0], point[1], zofs)
                 for point in outline]
-        startp = exterior[0]
-        endp = exterior[-1]
-        exterior.append(startp)
+        normalprofile = [
+                (
+                    (width/2.0) *  cos(the * (3.14159 / 8.0)),
+                    (height/2.0) * sin(the * (3.14159 / 8.0))
+                    )
+                for the in xrange(0, 16)
+                ]
+
+        print "Exterior is", exterior
+        #startp = exterior[0]
+        #endp = exterior[-1]
+        #exterior.append(startp)
+        #dx = abs(startp[0]-endp[0])
+        #dy = abs(startp[1]-endp[1])
+        #dz = abs(startp[2]-endp[2])
+        #if (dx*dx+dy*dy+dz*dz)> 0.001:
+            #exterior.insert(0, endp)
+
         GLE.gleExtrusion(
                 extrudeprofile,
-                None,
+                normalprofile,
                 (0, 0, 1),
-                exterior,
+                exterior[:-1],
                 None)
 
     def paintGL(self):
