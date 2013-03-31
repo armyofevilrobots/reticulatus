@@ -1,6 +1,8 @@
 [submodule "deps/cgal-bindings"]
 	path = deps/cgal-bindings
 	url = https://code.google.com/p/cgal-bindings
+    ignore = dirty
 [submodule "reticulatus/gui/icons"]
 	path = reticulatus/gui/icons
 	url = https://github.com/yusukekamiyamane/fugue-icons.git
+    ignore = dirty
